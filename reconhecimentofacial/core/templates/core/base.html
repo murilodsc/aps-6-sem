@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Reconhecimento Facial{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/css/base.css' %}" />
+    {% block extra_styles %}{% endblock %}
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a class="navbar-brand" href="{% url 'index' %}"
+          >Reconhecimento Facial</a
+        >
+        <div class="navbar-nav">
+          {% if user.is_authenticated %}
+          <!--                    <span class="navbar-text">Olá, {{ user.username }}</span>-->
+
+          <a class="nav-link" href="{% url 'index' %}">Home</a>
+          <a class="nav-link" href="{% url 'capturar_foto' %}">Capturar Foto</a>
+          <a class="btn-logout" href="{% url 'logout' %}">Sair</a>
+          {% else %}
+          <a class="btn-login" href="{% url 'login' %}">Entrar</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      {% if messages %} {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
