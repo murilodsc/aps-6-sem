@@ -35,10 +35,17 @@
     transform: translate(-50%, -50%);
     width: 250px;
     height: 250px;
-    border: 3px solid #4CAF50;
+    border: 4px solid #ef5350;
     border-radius: 50%;
     pointer-events: none;
-    opacity: 0.7;
+    opacity: 0.8;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 20px rgba(239, 83, 80, 0.5);
+}
+
+.face-overlay.face-detected {
+    border-color: #4CAF50;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
 }
 
 .buttons-container {
@@ -61,13 +68,12 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #3b82f6;
     color: white;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    background: #2563eb;
 }
 
 .btn-secondary {

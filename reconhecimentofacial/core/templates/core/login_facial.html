@@ -30,13 +30,10 @@
         </div>
 
         <div class="buttons-container">
-            <button type="button" id="startCamera" class="btn btn-primary">
-                Iniciar Câmera
-            </button>
-            <button type="button" id="captureAndRecognize" class="btn btn-success" style="display: none;"
+            <button type="button" id="startCamera" class="btn btn-primary"
                     data-recognize-url="{% url 'reconhecer_face' %}"
                     data-index-url="{% url 'index' %}">
-                Reconhecer Rosto
+                Iniciar Câmera
             </button>
             <button type="button" id="tryAgain" class="btn btn-secondary" style="display: none;">
                 Tentar Novamente

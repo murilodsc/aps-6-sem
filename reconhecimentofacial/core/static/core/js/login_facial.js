@@ -10,12 +10,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
     const startCameraBtn = document.getElementById('startCamera');
-    const captureBtn = document.getElementById('captureAndRecognize');
     const tryAgainBtn = document.getElementById('tryAgain');
     const statusMessage = document.getElementById('statusMessage');
     const processing = document.querySelector('.processing');
+    const faceOverlay = document.querySelector('.face-overlay');
     
     let stream = null;
+    let detectionInterval = null;
+    let isProcessing = false;
+    let faceDetectedTime = null;
 
     /**
      * Exibe mensagem de status com estilo
@@ -44,8 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
             canvas.height = 480;
 
             startCameraBtn.style.display = 'none';
-            captureBtn.style.display = 'inline-block';
-            showMessage('Câmera ativada! Posicione seu rosto e clique em "Reconhecer Rosto".', 'success');
+            
+            // Aguardar vídeo estar pronto e iniciar detecção
+            video.addEventListener('loadedmetadata', function() {
+                startFaceDetection();
+            });
+            
+            showMessage('Câmera ativada! Posicione seu rosto no círculo para reconhecimento automático.', 'success');
         } catch (err) {
             console.error('Erro ao acessar câmera:', err);
             showMessage('Erro ao acessar a câmera. Verifique se deu permissão.', 'error');
@@ -53,21 +61,113 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * Inicia detecção contínua de rosto
+     */
+    function startFaceDetection() {
+        detectionInterval = setInterval(() => {
+            if (isProcessing) return;
+            
+            // Detectar se há rosto na região do círculo
+            const faceDetected = detectFaceInCircle();
+            
+            if (faceDetected) {
+                faceOverlay.classList.add('face-detected');
+                
+                // Marcar o tempo da primeira detecção
+                if (!faceDetectedTime) {
+                    faceDetectedTime = Date.now();
+                }
+                
+                // Se rosto ficou posicionado por 1.5 segundos, capturar
+                if (Date.now() - faceDetectedTime >= 1500) {
+                    captureAndRecognize();
+                }
+            } else {
+                faceOverlay.classList.remove('face-detected');
+                faceDetectedTime = null;
+            }
+        }, 100);
+    }
+
+    /**
+     * Detecta se há rosto na região do círculo central
+     * Usa análise de pixels para determinar presença de conteúdo
+     */
+    function detectFaceInCircle() {
+        if (!video.videoWidth || !video.videoHeight) return false;
+        
+        // Criar canvas temporário para análise
+        const tempCanvas = document.createElement('canvas');
+        const tempContext = tempCanvas.getContext('2d');
+        
+        // Configurar dimensões
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+        
+        // Desenhar frame atual
+        tempContext.drawImage(video, 0, 0);
+        
+        // Calcular região central (onde está o círculo)
+        const centerX = tempCanvas.width / 2;
+        const centerY = tempCanvas.height / 2;
+        const radius = 120;
+        
+        // Analisar pixels na região central
+        const imageData = tempContext.getImageData(
+            centerX - radius,
+            centerY - radius,
+            radius * 2,
+            radius * 2
+        );
+        
+        // Calcular variação de pixels
+        let totalBrightness = 0;
+        let pixelCount = 0;
+        
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            const r = imageData.data[i];
+            const g = imageData.data[i + 1];
+            const b = imageData.data[i + 2];
+            const brightness = (r + g + b) / 3;
+            totalBrightness += brightness;
+            pixelCount++;
+        }
+        
+        const avgBrightness = totalBrightness / pixelCount;
+        
+        // Se a média de brilho estiver em uma faixa razoável, considera que há um rosto
+        return avgBrightness > 30 && avgBrightness < 220;
+    }
+
+    /**
+     * Para a detecção de rosto
+     */
+    function stopFaceDetection() {
+        if (detectionInterval) {
+            clearInterval(detectionInterval);
+            detectionInterval = null;
+        }
+        faceDetectedTime = null;
+    }
+
+    /**
      * Captura imagem da webcam e envia para reconhecimento
      */
     async function captureAndRecognize() {
+        if (isProcessing) return;
+        isProcessing = true;
+        stopFaceDetection();
         try {
             // Capturar frame do vídeo
             context.drawImage(video, 0, 0, 640, 480);
             const imageData = canvas.toDataURL('image/jpeg', 0.8);
 
-            // Desabilitar botão e mostrar loading
-            captureBtn.disabled = true;
+            // Mostrar loading
             processing.classList.add('active');
-            showMessage('Processando reconhecimento facial...', 'info');
+            showMessage('Rosto detectado! Processando reconhecimento facial...', 'info');
 
-            // Obter URL do endpoint (configurada no template)
-            const recognizeUrl = captureBtn.dataset.recognizeUrl;
+            // Obter URL do endpoint
+            const recognizeUrl = startCameraBtn.dataset.recognizeUrl;
 
             // Enviar imagem para o servidor
             const response = await fetch(recognizeUrl, {
@@ -81,9 +181,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             processing.classList.remove('active');
-            captureBtn.disabled = false;
 
             if (data.success) {
+                isProcessing = false;
                 // Reconhecimento bem-sucedido
                 showMessage(
                     `✅ ${data.message}<br>Confiança: ${data.confidence}<br>Redirecionando...`,
@@ -93,8 +193,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Parar câmera
                 stopCamera();
 
-                // Obter URL de redirecionamento (configurada no template)
-                const indexUrl = captureBtn.dataset.indexUrl;
+                // Obter URL de redirecionamento
+                const indexUrl = startCameraBtn.dataset.indexUrl;
 
                 // Redirecionar após 2 segundos
                 setTimeout(() => {
@@ -102,15 +202,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 2000);
             } else {
                 // Falha no reconhecimento
+                isProcessing = false;
                 showMessage(`❌ ${data.message}`, 'error');
-                captureBtn.style.display = 'none';
                 tryAgainBtn.style.display = 'inline-block';
+                faceOverlay.classList.remove('face-detected');
             }
         } catch (error) {
             processing.classList.remove('active');
-            captureBtn.disabled = false;
+            isProcessing = false;
             console.error('Erro:', error);
             showMessage('Erro ao processar reconhecimento. Tente novamente.', 'error');
+            tryAgainBtn.style.display = 'inline-block';
+            faceOverlay.classList.remove('face-detected');
         }
     }
 
@@ -118,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Para a transmissão da câmera
      */
     function stopCamera() {
+        stopFaceDetection();
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
             stream = null;
@@ -129,13 +233,14 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function tryAgain() {
         tryAgainBtn.style.display = 'none';
-        captureBtn.style.display = 'inline-block';
-        showMessage('Posicione seu rosto e tente novamente.', 'info');
+        isProcessing = false;
+        faceOverlay.classList.remove('face-detected');
+        startFaceDetection();
+        showMessage('Posicione seu rosto no círculo para tentar novamente.', 'info');
     }
 
     // Event Listeners
     startCameraBtn.addEventListener('click', startCamera);
-    captureBtn.addEventListener('click', captureAndRecognize);
     tryAgainBtn.addEventListener('click', tryAgain);
 
     // Limpar recursos ao sair da página
