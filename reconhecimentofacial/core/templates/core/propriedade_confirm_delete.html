@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %} {% load static %} {% block title %}Confirmar
+Exclusão - {{ propriedade.nome_propriedade }}{% endblock %} {% block
+extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/propriedades.css' %}" />
+{% endblock %} {% block content %}
+<div class="delete-container">
+  <div class="delete-card">
+    <div class="delete-icon">⚠️</div>
+    <h2>Confirmar Exclusão</h2>
+    <p class="delete-warning">
+      Tem certeza que deseja excluir a propriedade
+      <strong>{{ propriedade.nome_propriedade }}</strong>?
+    </p>
+
+    <div class="delete-info">
+      <p><strong>Propriedade:</strong> {{ propriedade.nome_propriedade }}</p>
+      <p><strong>Proprietário:</strong> {{ propriedade.proprietario }}</p>
+      <p>
+        <strong>Cidade:</strong> {{ propriedade.cidade }}/{{ propriedade.estado
+        }}
+      </p>
+      <p><strong>Agrotóxico:</strong> {{ propriedade.agrotoxico_utilizado }}</p>
+    </div>
+
+    <p class="delete-note">
+      <strong>Nota:</strong> Esta ação não pode ser desfeita. O registro será
+      marcado como inativo.
+    </p>
+
+    <form method="post" class="delete-form">
+      {% csrf_token %}
+      <div class="delete-actions">
+        <button type="submit" class="btn-danger">🗑️ Sim, Excluir</button>
+        <a
+          href="{% url 'propriedade_detail' propriedade.pk %}"
+          class="btn-secondary"
+        >
+          ✖ Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Sistema de Gestão{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/css/base.css' %}" />
+    {% block extra_styles %}{% endblock %}
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a class="navbar-brand" href="{% url 'index' %}"
+          >Sistema de Gestão</a
+        >
+        <div class="navbar-nav">
+          {% if user.is_authenticated %}
+          <div class="user-info-navbar">
+            <span class="welcome-message">
+              Bem-vindo, {{ user.get_full_name|default:user.username }}!
+            </span>
+            <span class="badge-perfil-nav badge-perfil-{{ user.perfil.tipo_perfil|lower }}">
+              {{ user.perfil.get_tipo_perfil_display_icon }} {{ user.perfil.get_tipo_perfil_display }}
+            </span>
+          </div>
+          <a class="nav-link" href="{% url 'index' %}">Home</a>
+          <a class="nav-link" href="{% url 'propriedades_list' %}"
+            >Propriedades</a
+          >
+          <a class="nav-link" href="{% url 'usuarios_list' %}">Usuários</a>
+          <a class="btn-logout" href="{% url 'logout' %}">Sair</a>
+          {% else %}
+          <a class="btn-login" href="{% url 'login' %}">Entrar</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      {% if messages %} {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,135 @@
+{% extends 'core/base.html' %} {% load static %} {% block title %} Usuários do
+Sistema {% endblock %} {% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/usuarios.css' %}" />
+{% endblock %} {% block content %}
+<div class="page-header">
+  <h1>👥 Usuários do Sistema</h1>
+  <a href="{% url 'usuario_create' %}" class="btn-primary"> + Novo Usuário </a>
+</div>
+
+<div class="filters-container">
+  <form method="get" class="filters-form">
+    <div class="filter-group">
+      <input
+        type="text"
+        name="search"
+        placeholder="Buscar por nome, usuário ou email..."
+        value="{{ search }}"
+        class="search-input"
+      />
+    </div>
+
+    <button type="submit" class="btn-filter">🔍 Buscar</button>
+    <a href="{% url 'usuarios_list' %}" class="btn-clear">✖ Limpar</a>
+  </form>
+</div>
+
+{% if page_obj %}
+<div class="usuarios-grid">
+  {% for usuario in page_obj %}
+  <div class="usuario-card">
+    <div class="usuario-foto">
+      {% if usuario.perfil.foto %}
+      <img
+        src="{{ usuario.perfil.foto.url }}"
+        alt="Foto de {{ usuario.get_full_name }}"
+      />
+      {% else %}
+      <div class="usuario-foto-placeholder">
+        {{ usuario.first_name.0|default:usuario.username.0|upper }}
+      </div>
+      {% endif %}
+    </div>
+    <div class="usuario-info">
+      <h3>{{ usuario.get_full_name|default:usuario.username }}</h3>
+      <p class="usuario-username">@{{ usuario.username }}</p>
+      <div class="usuario-badges">
+        <span class="badge-perfil-card badge-perfil-{{ usuario.perfil.tipo_perfil|lower }}">
+          {{ usuario.perfil.get_tipo_perfil_display_icon }} {{ usuario.perfil.get_tipo_perfil_display }}
+        </span>
+        {% if usuario.is_staff %}
+        <span class="badge-admin-card">👑 Admin</span>
+        {% endif %}
+      </div>
+      <p class="usuario-email">{{ usuario.email }}</p>
+      {% if usuario.perfil.telefone %}
+      <p class="usuario-telefone">📞 {{ usuario.perfil.telefone }}</p>
+      {% endif %}
+      <p class="usuario-cadastro">
+        Cadastrado em: {{ usuario.date_joined|date:"d/m/Y" }}
+      </p>
+    </div>
+    <div class="usuario-actions">
+      <a
+        href="{% url 'usuario_detail' usuario.pk %}"
+        class="btn-action btn-view"
+        title="Visualizar"
+      >
+        👁️ Ver
+      </a>
+      {% if request.user.is_staff or request.user.pk == usuario.pk %}
+      <a
+        href="{% url 'usuario_update' usuario.pk %}"
+        class="btn-action btn-edit"
+        title="Editar"
+      >
+        ✏️ Editar
+      </a>
+      {% endif %}
+      {% if request.user.is_staff and request.user.pk != usuario.pk %}
+      <a
+        href="{% url 'usuario_delete' usuario.pk %}"
+        class="btn-action btn-delete"
+        title="Excluir"
+      >
+        🗑️ Excluir
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}
+  <a
+    href="?page=1{% if search %}&search={{ search }}{% endif %}"
+    class="page-link"
+    >« Primeira</a
+  >
+  <a
+    href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}"
+    class="page-link"
+    >‹ Anterior</a
+  >
+  {% endif %}
+
+  <span class="page-info">
+    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+  </span>
+
+  {% if page_obj.has_next %}
+  <a
+    href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}"
+    class="page-link"
+    >Próxima ›</a
+  >
+  <a
+    href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}"
+    class="page-link"
+    >Última »</a
+  >
+  {% endif %}
+</div>
+{% endif %} {% else %}
+<div class="card">
+  <div class="card-body empty-state">
+    <h3>👥 Nenhum usuário encontrado</h3>
+    <p>Clique no botão acima para cadastrar o primeiro usuário!</p>
+    <a href="{% url 'usuario_create' %}" class="btn-primary">
+      + Cadastrar Primeiro Usuário
+    </a>
+  </div>
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ propriedade.nome_propriedade }} - Detalhes{% endblock %}
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/propriedades.css' %}" />
+{% endblock %}
+{% block content %}
+<div class="detail-container">
+  <div class="detail-header">
+    <div>
+      <h1>🌾 {{ propriedade.nome_propriedade }}</h1>
+      <p class="detail-subtitle">
+        Cadastrado em {{ propriedade.data_cadastro|date:"d/m/Y H:i" }}
+      </p>
+    </div>
+    <span class="badge badge-nivel-{{ propriedade.nivel_impacto }} badge-large">
+      Nível {{ propriedade.nivel_impacto }}
+    </span>
+  </div>
+
+  <div class="detail-actions">
+    <a href="{% url 'propriedades_list' %}" class="btn-secondary"> ← Voltar </a>
+    <a href="{% url 'propriedade_update' propriedade.pk %}" class="btn-primary">
+      ✏️ Editar
+    </a>
+    <a href="{% url 'propriedade_delete' propriedade.pk %}" class="btn-danger">
+      🗑️ Excluir
+    </a>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-card">
+      <h3>👤 Informações do Proprietário</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Nome:</span>
+          <span class="info-value">{{ propriedade.proprietario }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">CPF/CNPJ:</span>
+          <span class="info-value">{{ propriedade.cpf_cnpj }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>📋 Dados da Propriedade</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Área:</span>
+          <span class="info-value"
+            >{{ propriedade.area_hectares }} hectares</span
+          >
+        </div>
+        <div class="info-item">
+          <span class="info-label">Data de Identificação:</span>
+          <span class="info-value"
+            >{{ propriedade.data_identificacao|date:"d/m/Y" }}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card full-width">
+      <h3>📍 Localização</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Endereço:</span>
+          <span class="info-value">{{ propriedade.endereco }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Cidade/Estado:</span>
+          <span class="info-value"
+            >{{ propriedade.cidade }} - {{ propriedade.estado }}</span
+          >
+        </div>
+        {% if propriedade.latitude and propriedade.longitude %}
+        <div class="info-item">
+          <span class="info-label">Coordenadas:</span>
+          <span class="info-value">
+            Lat: {{ propriedade.latitude }}, Long: {{ propriedade.longitude }}
+            <a
+              href="https://www.google.com/maps?q={{ propriedade.latitude }},{{ propriedade.longitude }}"
+              target="_blank"
+              class="link-maps"
+            >
+              🗺️ Ver no Google Maps
+            </a>
+          </span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="detail-card full-width alert-card">
+      <h3>☠️ Informações sobre Agrotóxicos Proibidos</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Agrotóxico Identificado:</span>
+          <span class="info-value highlight-danger"
+            >{{ propriedade.agrotoxico_utilizado }}</span
+          >
+        </div>
+        <div class="info-item">
+          <span class="info-label">Nível de Impacto:</span>
+          <span class="info-value">
+            <span class="badge badge-nivel-{{ propriedade.nivel_impacto }}">
+              {% if propriedade.nivel_impacto == 1 %}
+                Nível 1 - Baixo Impacto
+              {% elif propriedade.nivel_impacto == 2 %}
+                Nível 2 - Médio Impacto
+              {% elif propriedade.nivel_impacto == 3 %}
+                Nível 3 - Alto Impacto
+              {% endif %}
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-card full-width">
+      <h3>🌊 Descrição do Impacto Ambiental</h3>
+      <div class="impact-description">
+        <p>{{ propriedade.descricao_impacto }}</p>
+      </div>
+    </div>
+
+    <div class="detail-card full-width metadata-card">
+      <h3>ℹ️ Informações do Registro</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Cadastrado por:</span>
+          <span class="info-value">
+            {% if propriedade.usuario_cadastro %}
+            <div class="user-badges-detail">
+              <span class="badge-perfil-detail badge-perfil-{{ propriedade.usuario_cadastro.perfil.tipo_perfil|lower }}">
+                {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display_icon }} {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display }}
+              </span>
+              <strong>{{ propriedade.usuario_cadastro.get_full_name|default:propriedade.usuario_cadastro.username }}</strong>
+              {% if propriedade.usuario_cadastro.is_staff %}
+              <span class="badge-admin-detail">👑 Admin</span>
+              {% endif %}
+            </div>
+            {% else %}
+            <span class="text-muted">Não informado</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Data de Cadastro:</span>
+          <span class="info-value"
+            >{{ propriedade.data_cadastro|date:"d/m/Y H:i" }}</span
+          >
+        </div>
+        <div class="info-item">
+          <span class="info-label">Última Atualização:</span>
+          <span class="info-value"
+            >{{ propriedade.data_atualizacao|date:"d/m/Y H:i" }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

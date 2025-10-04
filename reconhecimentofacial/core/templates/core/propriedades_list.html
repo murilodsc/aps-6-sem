@@ -1,0 +1,136 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Propriedades Rurais - Agrotóxicos Proibidos{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/propriedades.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🌾 Propriedades Rurais com Agrotóxicos Proibidos</h1>
+    <a href="{% url 'propriedade_create' %}" class="btn-primary">
+        + Nova Propriedade
+    </a>
+</div>
+
+<div class="filters-container">
+    <form method="get" class="filters-form">
+        <div class="filter-group">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Buscar por nome, proprietário ou cidade..." 
+                value="{{ search }}"
+                class="search-input"
+            >
+        </div>
+        
+        <div class="filter-group">
+            <select name="nivel" class="filter-select">
+                <option value="">Todos os Níveis</option>
+                <option value="1" {% if nivel_filtro == '1' %}selected{% endif %}>Nível 1 - Baixo Impacto</option>
+                <option value="2" {% if nivel_filtro == '2' %}selected{% endif %}>Nível 2 - Médio Impacto</option>
+                <option value="3" {% if nivel_filtro == '3' %}selected{% endif %}>Nível 3 - Alto Impacto</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn-filter">🔍 Filtrar</button>
+        <a href="{% url 'propriedades_list' %}" class="btn-clear">✖ Limpar</a>
+    </form>
+</div>
+
+{% if page_obj %}
+<div class="card">
+    <div class="card-header">
+        <h3>📋 Lista de Propriedades ({{ page_obj.paginator.count }} registros)</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Propriedade</th>
+                        <th>Proprietário</th>
+                        <th>Cadastrado Por</th>
+                        <th>Cidade/UF</th>
+                        <th>Agrotóxico</th>
+                        <th>Nível</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for propriedade in page_obj %}
+                    <tr>
+                        <td>{{ propriedade.nome_propriedade }}</td>
+                        <td>{{ propriedade.proprietario }}</td>
+                        <td>
+                            {% if propriedade.usuario_cadastro %}
+                            <div class="user-badges-table">
+                                <span class="badge-perfil-table badge-perfil-{{ propriedade.usuario_cadastro.perfil.tipo_perfil|lower }}">
+                                    {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display_icon }}
+                                </span>
+                                <span class="username-table">{{ propriedade.usuario_cadastro.get_full_name|default:propriedade.usuario_cadastro.username }}</span>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ propriedade.cidade }}/{{ propriedade.estado }}</td>
+                        <td>{{ propriedade.agrotoxico_utilizado }}</td>
+                        <td>
+                            <span class="badge badge-nivel-{{ propriedade.nivel_impacto }}">
+                                Nível {{ propriedade.nivel_impacto }}
+                            </span>
+                        </td>
+                        <td>{{ propriedade.data_identificacao|date:"d/m/Y" }}</td>
+                        <td class="action-buttons">
+                            <a href="{% url 'propriedade_detail' propriedade.pk %}" class="btn-action btn-view" title="Visualizar">
+                                👁️
+                            </a>
+                            <a href="{% url 'propriedade_update' propriedade.pk %}" class="btn-action btn-edit" title="Editar">
+                                ✏️
+                            </a>
+                            <a href="{% url 'propriedade_delete' propriedade.pk %}" class="btn-action btn-delete" title="Excluir">
+                                🗑️
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if search %}&search={{ search }}{% endif %}{% if nivel_filtro %}&nivel={{ nivel_filtro }}{% endif %}" class="page-link">« Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if nivel_filtro %}&nivel={{ nivel_filtro }}{% endif %}" class="page-link">‹ Anterior</a>
+            {% endif %}
+            
+            <span class="page-info">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if nivel_filtro %}&nivel={{ nivel_filtro }}{% endif %}" class="page-link">Próxima ›</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if nivel_filtro %}&nivel={{ nivel_filtro }}{% endif %}" class="page-link">Última »</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body empty-state">
+        <h3>📭 Nenhuma propriedade encontrada</h3>
+        <p>Clique no botão acima para cadastrar a primeira propriedade!</p>
+        <a href="{% url 'propriedade_create' %}" class="btn-primary">
+            + Cadastrar Primeira Propriedade
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

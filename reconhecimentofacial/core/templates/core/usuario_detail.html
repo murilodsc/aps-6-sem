@@ -1,0 +1,137 @@
+{% extends 'core/base.html' %} {% load static %} {% block title %} {{
+usuario_perfil.get_full_name }} - Perfil {% endblock %} {% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/usuarios.css' %}" />
+{% endblock %} {% block content %}
+<div class="detail-container">
+  <div class="detail-header">
+    <div class="header-user-info">
+      <div class="detail-foto-grande">
+        {% if usuario_perfil.perfil.foto %}
+        <img
+          src="{{ usuario_perfil.perfil.foto.url }}"
+          alt="Foto de {{ usuario_perfil.get_full_name }}"
+        />
+        {% else %}
+        <div class="foto-placeholder-grande">
+          {{ usuario_perfil.first_name.0|default:usuario_perfil.username.0|upper
+          }}
+        </div>
+        {% endif %}
+      </div>
+      <div>
+        <h1>
+          {{ usuario_perfil.get_full_name|default:usuario_perfil.username }}
+        </h1>
+        <p class="detail-username">@{{ usuario_perfil.username }}</p>
+        <div class="badges-container">
+          <span class="badge-perfil badge-perfil-{{ usuario_perfil.perfil.tipo_perfil|lower }}">
+            {{ usuario_perfil.perfil.get_tipo_perfil_display_icon }} {{ usuario_perfil.perfil.get_tipo_perfil_display }}
+          </span>
+          {% if usuario_perfil.is_staff %}
+          <span class="badge-admin">👑 Administrador</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-actions">
+    <a href="{% url 'usuarios_list' %}" class="btn-secondary"> ← Voltar </a>
+    {% if request.user.is_staff or request.user.pk == usuario_perfil.pk %}
+    <a href="{% url 'usuario_update' usuario_perfil.pk %}" class="btn-primary">
+      ✏️ Editar
+    </a>
+    {% endif %}
+    {% if request.user.is_staff and request.user.pk != usuario_perfil.pk %}
+    <a href="{% url 'usuario_delete' usuario_perfil.pk %}" class="btn-danger">
+      🗑️ Excluir
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-card">
+      <h3>📧 Contato</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{ usuario_perfil.email }}</span>
+        </div>
+        {% if usuario_perfil.perfil.telefone %}
+        <div class="info-item">
+          <span class="info-label">Telefone:</span>
+          <span class="info-value">{{ usuario_perfil.perfil.telefone }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h3>👤 Dados Pessoais</h3>
+      <div class="detail-info">
+        {% if usuario_perfil.perfil.cpf %}
+        <div class="info-item">
+          <span class="info-label">CPF:</span>
+          <span class="info-value">{{ usuario_perfil.perfil.cpf }}</span>
+        </div>
+        {% endif %} {% if usuario_perfil.perfil.data_nascimento %}
+        <div class="info-item">
+          <span class="info-label">Data de Nascimento:</span>
+          <span class="info-value"
+            >{{ usuario_perfil.perfil.data_nascimento|date:"d/m/Y" }}</span
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if usuario_perfil.perfil.endereco %}
+    <div class="detail-card full-width">
+      <h3>📍 Endereço</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-value">{{ usuario_perfil.perfil.endereco }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %} {% if usuario_perfil.perfil.bio %}
+    <div class="detail-card full-width">
+      <h3>📝 Biografia</h3>
+      <div class="bio-content">
+        <p>{{ usuario_perfil.perfil.bio }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="detail-card full-width metadata-card">
+      <h3>ℹ️ Informações do Sistema</h3>
+      <div class="detail-info">
+        <div class="info-item">
+          <span class="info-label">Data de Cadastro:</span>
+          <span class="info-value"
+            >{{ usuario_perfil.date_joined|date:"d/m/Y H:i" }}</span
+          >
+        </div>
+        <div class="info-item">
+          <span class="info-label">Último Login:</span>
+          <span class="info-value">
+            {% if usuario_perfil.last_login %} {{
+            usuario_perfil.last_login|date:"d/m/Y H:i" }} {% else %} Nunca
+            acessou {% endif %}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Status:</span>
+          <span class="info-value">
+            {% if usuario_perfil.is_active %}
+            <span class="badge-success">✅ Ativo</span>
+            {% else %}
+            <span class="badge-danger">❌ Inativo</span>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

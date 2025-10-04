@@ -1,0 +1,228 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if propriedade %}Editar{% else %}Nova{% endif %} Propriedade{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/propriedades.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2>{% if propriedade %}✏️ Editar Propriedade{% else %}➕ Nova Propriedade Rural{% endif %}</h2>
+        <p>Registre informações sobre propriedades que utilizam agrotóxicos proibidos</p>
+    </div>
+
+    <form method="post" class="property-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>📋 Informações da Propriedade</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nome_propriedade">Nome da Propriedade *</label>
+                    <input 
+                        type="text" 
+                        id="nome_propriedade" 
+                        name="nome_propriedade" 
+                        required
+                        value="{% if propriedade %}{{ propriedade.nome_propriedade }}{% endif %}"
+                        placeholder="Ex: Fazenda Santa Rita"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="proprietario">Nome do Proprietário *</label>
+                    <input 
+                        type="text" 
+                        id="proprietario" 
+                        name="proprietario" 
+                        required
+                        value="{% if propriedade %}{{ propriedade.proprietario }}{% endif %}"
+                        placeholder="Ex: João da Silva"
+                    >
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cpf_cnpj">CPF/CNPJ *</label>
+                    <input 
+                        type="text" 
+                        id="cpf_cnpj" 
+                        name="cpf_cnpj" 
+                        required
+                        value="{% if propriedade %}{{ propriedade.cpf_cnpj }}{% endif %}"
+                        placeholder="Ex: 123.456.789-00"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="area_hectares">Área (Hectares) *</label>
+                    <input 
+                        type="number" 
+                        id="area_hectares" 
+                        name="area_hectares" 
+                        step="0.01"
+                        min="0.01"
+                        required
+                        value="{% if propriedade %}{{ propriedade.area_hectares }}{% endif %}"
+                        placeholder="Ex: 150.50"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>📍 Localização</h3>
+            
+            <div class="form-group">
+                <label for="endereco">Endereço Completo *</label>
+                <textarea 
+                    id="endereco" 
+                    name="endereco" 
+                    rows="2" 
+                    required
+                    placeholder="Ex: Rodovia BR-101, Km 45, Zona Rural"
+                >{% if propriedade %}{{ propriedade.endereco }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cidade">Cidade *</label>
+                    <input 
+                        type="text" 
+                        id="cidade" 
+                        name="cidade" 
+                        required
+                        value="{% if propriedade %}{{ propriedade.cidade }}{% endif %}"
+                        placeholder="Ex: Campinas"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado (UF) *</label>
+                    <select id="estado" name="estado" required>
+                        <option value="">Selecione</option>
+                        <option value="AC" {% if propriedade.estado == 'AC' %}selected{% endif %}>AC</option>
+                        <option value="AL" {% if propriedade.estado == 'AL' %}selected{% endif %}>AL</option>
+                        <option value="AP" {% if propriedade.estado == 'AP' %}selected{% endif %}>AP</option>
+                        <option value="AM" {% if propriedade.estado == 'AM' %}selected{% endif %}>AM</option>
+                        <option value="BA" {% if propriedade.estado == 'BA' %}selected{% endif %}>BA</option>
+                        <option value="CE" {% if propriedade.estado == 'CE' %}selected{% endif %}>CE</option>
+                        <option value="DF" {% if propriedade.estado == 'DF' %}selected{% endif %}>DF</option>
+                        <option value="ES" {% if propriedade.estado == 'ES' %}selected{% endif %}>ES</option>
+                        <option value="GO" {% if propriedade.estado == 'GO' %}selected{% endif %}>GO</option>
+                        <option value="MA" {% if propriedade.estado == 'MA' %}selected{% endif %}>MA</option>
+                        <option value="MT" {% if propriedade.estado == 'MT' %}selected{% endif %}>MT</option>
+                        <option value="MS" {% if propriedade.estado == 'MS' %}selected{% endif %}>MS</option>
+                        <option value="MG" {% if propriedade.estado == 'MG' %}selected{% endif %}>MG</option>
+                        <option value="PA" {% if propriedade.estado == 'PA' %}selected{% endif %}>PA</option>
+                        <option value="PB" {% if propriedade.estado == 'PB' %}selected{% endif %}>PB</option>
+                        <option value="PR" {% if propriedade.estado == 'PR' %}selected{% endif %}>PR</option>
+                        <option value="PE" {% if propriedade.estado == 'PE' %}selected{% endif %}>PE</option>
+                        <option value="PI" {% if propriedade.estado == 'PI' %}selected{% endif %}>PI</option>
+                        <option value="RJ" {% if propriedade.estado == 'RJ' %}selected{% endif %}>RJ</option>
+                        <option value="RN" {% if propriedade.estado == 'RN' %}selected{% endif %}>RN</option>
+                        <option value="RS" {% if propriedade.estado == 'RS' %}selected{% endif %}>RS</option>
+                        <option value="RO" {% if propriedade.estado == 'RO' %}selected{% endif %}>RO</option>
+                        <option value="RR" {% if propriedade.estado == 'RR' %}selected{% endif %}>RR</option>
+                        <option value="SC" {% if propriedade.estado == 'SC' %}selected{% endif %}>SC</option>
+                        <option value="SP" {% if propriedade.estado == 'SP' %}selected{% endif %}>SP</option>
+                        <option value="SE" {% if propriedade.estado == 'SE' %}selected{% endif %}>SE</option>
+                        <option value="TO" {% if propriedade.estado == 'TO' %}selected{% endif %}>TO</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="latitude">Latitude (opcional)</label>
+                    <input 
+                        type="number" 
+                        id="latitude" 
+                        name="latitude" 
+                        step="0.000001"
+                        value="{% if propriedade %}{{ propriedade.latitude }}{% endif %}"
+                        placeholder="Ex: -23.550520"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="longitude">Longitude (opcional)</label>
+                    <input 
+                        type="number" 
+                        id="longitude" 
+                        name="longitude" 
+                        step="0.000001"
+                        value="{% if propriedade %}{{ propriedade.longitude }}{% endif %}"
+                        placeholder="Ex: -46.633308"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>☠️ Informações sobre Agrotóxicos</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="agrotoxico_utilizado">Agrotóxico Proibido Utilizado *</label>
+                    <input 
+                        type="text" 
+                        id="agrotoxico_utilizado" 
+                        name="agrotoxico_utilizado" 
+                        required
+                        value="{% if propriedade %}{{ propriedade.agrotoxico_utilizado }}{% endif %}"
+                        placeholder="Ex: Paraquat, DDT, Endosulfan"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="nivel_impacto">Nível de Impacto Ambiental *</label>
+                    <select id="nivel_impacto" name="nivel_impacto" required>
+                        <option value="">Selecione</option>
+                        <option value="1" {% if propriedade.nivel_impacto == 1 %}selected{% endif %}>Nível 1 - Baixo Impacto</option>
+                        <option value="2" {% if propriedade.nivel_impacto == 2 %}selected{% endif %}>Nível 2 - Médio Impacto</option>
+                        <option value="3" {% if propriedade.nivel_impacto == 3 %}selected{% endif %}>Nível 3 - Alto Impacto</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="data_identificacao">Data de Identificação *</label>
+                <input 
+                    type="date" 
+                    id="data_identificacao" 
+                    name="data_identificacao" 
+                    required
+                    value="{% if propriedade %}{{ propriedade.data_identificacao|date:'Y-m-d' }}{% endif %}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="descricao_impacto">Descrição do Impacto Ambiental *</label>
+                <textarea 
+                    id="descricao_impacto" 
+                    name="descricao_impacto" 
+                    rows="4" 
+                    required
+                    placeholder="Descreva os impactos observados nos lençóis freáticos, rios e mares..."
+                >{% if propriedade %}{{ propriedade.descricao_impacto }}{% endif %}</textarea>
+                <small class="form-help">Inclua detalhes sobre contaminação de água, impactos na fauna e flora, etc.</small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                {% if propriedade %}💾 Salvar Alterações{% else %}➕ Cadastrar Propriedade{% endif %}
+            </button>
+            <a href="{% url 'propriedades_list' %}" class="btn-secondary">
+                ✖ Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
