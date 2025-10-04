@@ -312,8 +312,12 @@ def usuario_update(request, pk):
             
             usuario.save()
             
-            # Atualizar perfil
-            perfil = usuario.perfil
+            # Atualizar perfil (criar se não existir)
+            try:
+                perfil = usuario.perfil
+            except PerfilUsuario.DoesNotExist:
+                # Criar perfil se não existir
+                perfil = PerfilUsuario.objects.create(usuario=usuario)
             
             # Apenas admin pode alterar o tipo de perfil
             if request.user.is_staff:
