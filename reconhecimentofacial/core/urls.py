@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("login/", views.login_view, name="login"),
+    path("login/facial/", views.login_facial_view, name="login_facial"),
+    path("reconhecer-face/", views.reconhecer_face, name="reconhecer_face"),
     path("logout/", views.logout_view, name="logout"),
     
     # CRUD Propriedades Rurais

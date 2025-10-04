@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
 import base64
 from .models import PropriedadeRural, PerfilUsuario
 
@@ -35,6 +36,148 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Você saiu com sucesso.')
     return redirect('login')
+
+
+def login_facial_view(request):
+    """View para login com reconhecimento facial"""
+    if request.user.is_authenticated:
+        return redirect('index')
+    
+    return render(request, 'core/login_facial.html')
+
+
+@csrf_exempt
+def reconhecer_face(request):
+    """Processa a imagem capturada e tenta reconhecer o usuário"""
+    # Import lazy para evitar problemas na inicialização do Django
+    import cv2
+    import face_recognition
+    import numpy as np
+    from PIL import Image
+    import io
+    
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método não permitido'}, status=405)
+    
+    try:
+        # Obter imagem da requisição
+        foto_data = request.POST.get('foto_base64')
+        if not foto_data:
+            return JsonResponse({'error': 'Nenhuma imagem fornecida'}, status=400)
+        
+        # Remover o prefixo data:image se existir
+        if foto_data.startswith('data:image'):
+            foto_data = foto_data.split(',')[1]
+        
+        # Decodificar imagem
+        image_data = base64.b64decode(foto_data)
+        image = Image.open(io.BytesIO(image_data))
+        
+        # Converter para RGB (necessário para face_recognition)
+        image_rgb = image.convert('RGB')
+        image_np = np.array(image_rgb)
+        
+        # Detectar faces na imagem capturada
+        face_locations = face_recognition.face_locations(image_np)
+        
+        if not face_locations:
+            return JsonResponse({
+                'success': False,
+                'message': 'Nenhum rosto detectado. Por favor, posicione seu rosto na câmera.'
+            })
+        
+        if len(face_locations) > 1:
+            return JsonResponse({
+                'success': False,
+                'message': 'Múltiplos rostos detectados. Certifique-se de estar sozinho na câmera.'
+            })
+        
+        # Extrair encoding da face capturada
+        face_encodings = face_recognition.face_encodings(image_np, face_locations)
+        if not face_encodings:
+            return JsonResponse({
+                'success': False,
+                'message': 'Não foi possível processar o rosto detectado.'
+            })
+        
+        captured_encoding = face_encodings[0]
+        
+        # Buscar todos os usuários com foto de perfil
+        usuarios_com_foto = PerfilUsuario.objects.exclude(foto__isnull=True).exclude(foto='')
+        
+        if not usuarios_com_foto.exists():
+            return JsonResponse({
+                'success': False,
+                'message': 'Nenhum usuário cadastrado com foto de perfil.'
+            })
+        
+        melhor_match = None
+        menor_distancia = float('inf')
+        tolerancia = 0.6  # Quanto menor, mais rigoroso
+        
+        # Comparar com cada usuário cadastrado
+        for perfil in usuarios_com_foto:
+            try:
+                # Carregar foto do perfil
+                perfil_image = face_recognition.load_image_file(perfil.foto.path)
+                
+                # Detectar face na foto do perfil
+                perfil_face_locations = face_recognition.face_locations(perfil_image)
+                
+                if not perfil_face_locations:
+                    continue
+                
+                # Extrair encoding da face do perfil
+                perfil_encodings = face_recognition.face_encodings(perfil_image, perfil_face_locations)
+                
+                if not perfil_encodings:
+                    continue
+                
+                perfil_encoding = perfil_encodings[0]
+                
+                # Calcular distância entre as faces
+                face_distance = face_recognition.face_distance([perfil_encoding], captured_encoding)[0]
+                
+                # Verificar se é o melhor match até agora
+                if face_distance < menor_distancia and face_distance < tolerancia:
+                    menor_distancia = face_distance
+                    melhor_match = perfil.usuario
+                    
+            except Exception as e:
+                print(f"Erro ao processar perfil {perfil.usuario.username}: {str(e)}")
+                continue
+        
+        # Se encontrou um match
+        if melhor_match:
+            # Calcular confiança do reconhecimento
+            confianca_percentual = (1 - menor_distancia) * 100
+            
+            # Validar confiança mínima de 60%
+            if confianca_percentual < 60:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Confiança muito baixa ({confianca_percentual:.1f}%). Tente novamente com melhor iluminação ou use login com senha.'
+                })
+            
+            # Fazer login do usuário
+            login(request, melhor_match, backend='django.contrib.auth.backends.ModelBackend')
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Bem-vindo(a), {melhor_match.get_full_name() or melhor_match.username}!',
+                'username': melhor_match.username,
+                'confidence': f'{confianca_percentual:.1f}%'
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'Rosto não reconhecido. Tente novamente ou use login com senha.'
+            })
+            
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Erro ao processar reconhecimento facial: {str(e)}'
+        }, status=500)
 
 
 @login_required

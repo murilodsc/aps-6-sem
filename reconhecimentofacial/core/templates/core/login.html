@@ -51,6 +51,13 @@
         <button type="submit" class="btn-login">Entrar</button>
       </form>
 
+      <div class="facial-login-option" style="text-align: center; margin: 20px 0; padding: 15px; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+        <p style="color: #666; margin-bottom: 10px;">ou</p>
+        <a href="{% url 'login_facial' %}" class="btn-facial">
+          Entrar com Reconhecimento Facial
+        </a>
+      </div>
+
       <div class="register-link">
         Não tem uma conta?
         <a href="{% url 'usuario_create' %}">Cadastre-se aqui</a>

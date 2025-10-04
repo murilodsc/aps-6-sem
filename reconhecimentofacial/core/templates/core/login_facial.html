@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Facial - Sistema de Reconhecimento</title>
+    <link rel="stylesheet" href="{% static 'core/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/login_facial.css' %}">
+</head>
+<body>
+    <div class="facial-login-container">
+        <div class="login-header">
+            <h1>🔐 Login Facial</h1>
+            <p>Posicione seu rosto na câmera e aguarde o reconhecimento</p>
+        </div>
+
+        <div id="statusMessage"></div>
+
+        <div class="video-container">
+            <video id="video" autoplay></video>
+            <div class="face-overlay"></div>
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="processing">
+            <div class="loader"></div>
+            <span>Processando reconhecimento facial...</span>
+        </div>
+
+        <div class="buttons-container">
+            <button type="button" id="startCamera" class="btn btn-primary">
+                📷 Iniciar Câmera
+            </button>
+            <button type="button" id="captureAndRecognize" class="btn btn-success" style="display: none;"
+                    data-recognize-url="{% url 'reconhecer_face' %}"
+                    data-index-url="{% url 'index' %}">
+                🎯 Reconhecer Rosto
+            </button>
+            <button type="button" id="tryAgain" class="btn btn-secondary" style="display: none;">
+                🔄 Tentar Novamente
+            </button>
+        </div>
+
+        <div class="back-link">
+            <a href="{% url 'login' %}">← Voltar para login com senha</a>
+        </div>
+    </div>
+
+    <script src="{% static 'core/js/login_facial.js' %}"></script>
+</body>
+</html>
