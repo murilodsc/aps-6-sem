@@ -12,6 +12,146 @@ import base64
 from .models import PropriedadeRural, PerfilUsuario
 
 
+def pode_criar_usuarios(usuario):
+    """Verifica se o usuário tem permissão para criar outros usuários"""
+    if not usuario.is_authenticated:
+        return False
+    
+    # Admin pode criar qualquer tipo
+    if usuario.is_staff or usuario.is_superuser:
+        return True
+    
+    # Verifica se tem perfil
+    if not hasattr(usuario, 'perfil'):
+        return False
+    
+    # Ministro e Diretor podem criar usuários
+    return usuario.perfil.tipo_perfil in ['MINISTRO', 'DIRETOR']
+
+
+def obter_perfis_permitidos(usuario):
+    """
+    Retorna lista de tipos de perfil que o usuário pode criar.
+    Retorna tuplas (valor, label) para usar em select.
+    """
+    if not usuario.is_authenticated:
+        return []
+    
+    # Admin/Superuser podem criar qualquer tipo
+    if usuario.is_staff or usuario.is_superuser:
+        return [
+            ('COMUM', '👤 Usuário Comum'),
+            ('DIRETOR', '👔 Diretor de Divisões'),
+            ('MINISTRO', '🎖️ Ministro do Meio Ambiente'),
+        ]
+    
+    # Verifica se tem perfil
+    if not hasattr(usuario, 'perfil'):
+        return []
+    
+    # Ministro pode criar Ministros, Diretores e Comuns
+    if usuario.perfil.tipo_perfil == 'MINISTRO':
+        return [
+            ('COMUM', '👤 Usuário Comum'),
+            ('DIRETOR', '👔 Diretor de Divisões'),
+            ('MINISTRO', '🎖️ Ministro do Meio Ambiente'),
+        ]
+    
+    # Diretor pode criar Diretores e Comuns
+    if usuario.perfil.tipo_perfil == 'DIRETOR':
+        return [
+            ('COMUM', '👤 Usuário Comum'),
+            ('DIRETOR', '👔 Diretor de Divisões'),
+        ]
+    
+    # Usuário comum não pode criar ninguém
+    return []
+
+
+def obter_niveis_visualizacao(usuario):
+    """
+    Retorna lista de níveis de impacto que o usuário pode visualizar.
+    """
+    if not usuario.is_authenticated:
+        return []
+    
+    # Admin/Superuser podem ver todos
+    if usuario.is_staff or usuario.is_superuser:
+        return [1, 2, 3]
+    
+    # Verifica se tem perfil
+    if not hasattr(usuario, 'perfil'):
+        return [1]  # Padrão: apenas nível 1
+    
+    # Ministro pode ver todos os níveis
+    if usuario.perfil.tipo_perfil == 'MINISTRO':
+        return [1, 2, 3]
+    
+    # Diretor pode ver níveis 1 e 2
+    if usuario.perfil.tipo_perfil == 'DIRETOR':
+        return [1, 2]
+    
+    # Usuário comum pode ver apenas nível 1
+    return [1]
+
+
+def obter_niveis_criacao(usuario):
+    """
+    Retorna lista de níveis de impacto que o usuário pode criar.
+    Retorna tuplas (valor, label) para usar em select.
+    """
+    if not usuario.is_authenticated:
+        return []
+    
+    # Admin/Superuser podem criar todos
+    if usuario.is_staff or usuario.is_superuser:
+        return [
+            (1, 'Nível 1 - Baixo Impacto'),
+            (2, 'Nível 2 - Médio Impacto'),
+            (3, 'Nível 3 - Alto Impacto'),
+        ]
+    
+    # Verifica se tem perfil
+    if not hasattr(usuario, 'perfil'):
+        return []
+    
+    # Ministro pode criar todos os níveis
+    if usuario.perfil.tipo_perfil == 'MINISTRO':
+        return [
+            (1, 'Nível 1 - Baixo Impacto'),
+            (2, 'Nível 2 - Médio Impacto'),
+            (3, 'Nível 3 - Alto Impacto'),
+        ]
+    
+    # Diretor pode criar níveis 1 e 2
+    if usuario.perfil.tipo_perfil == 'DIRETOR':
+        return [
+            (1, 'Nível 1 - Baixo Impacto'),
+            (2, 'Nível 2 - Médio Impacto'),
+        ]
+    
+    # Usuário comum não pode criar propriedades
+    return []
+
+
+def pode_criar_propriedades(usuario):
+    """Verifica se o usuário tem permissão para criar propriedades"""
+    if not usuario.is_authenticated:
+        return False
+    
+    # Admin pode criar
+    if usuario.is_staff or usuario.is_superuser:
+        return True
+    
+    # Verifica se tem perfil
+    if not hasattr(usuario, 'perfil'):
+        return False
+    
+    # Ministro e Diretor podem criar propriedades
+    # Usuário comum NÃO pode criar
+    return usuario.perfil.tipo_perfil in ['MINISTRO', 'DIRETOR']
+
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('index')
@@ -182,12 +322,27 @@ def reconhecer_face(request):
 
 @login_required
 def index(request):
+    # Verificar permissões do usuário
+    pode_criar_usuarios_flag = pode_criar_usuarios(request.user)
+    pode_criar_propriedades_flag = pode_criar_propriedades(request.user)
+    
+    # Obter níveis de visualização permitidos para o usuário
+    niveis_permitidos = obter_niveis_visualizacao(request.user)
+    
     # Estatísticas para o dashboard
     total_usuarios = User.objects.count()
-    total_propriedades = PropriedadeRural.objects.filter(ativo=True).count()
     
-    # Últimas propriedades cadastradas (apenas ativas)
-    ultimas_propriedades = PropriedadeRural.objects.filter(ativo=True).order_by('-data_cadastro')[:5]
+    # Filtrar propriedades por nível de permissão
+    total_propriedades = PropriedadeRural.objects.filter(
+        ativo=True,
+        nivel_impacto__in=niveis_permitidos
+    ).count()
+    
+    # Últimas propriedades cadastradas (filtradas por nível de permissão)
+    ultimas_propriedades = PropriedadeRural.objects.filter(
+        ativo=True,
+        nivel_impacto__in=niveis_permitidos
+    ).order_by('-data_cadastro')[:5]
     
     # Últimos usuários cadastrados (se for admin)
     ultimos_usuarios = None
@@ -199,6 +354,8 @@ def index(request):
         'total_propriedades': total_propriedades,
         'ultimas_propriedades': ultimas_propriedades,
         'ultimos_usuarios': ultimos_usuarios,
+        'pode_criar_usuarios': pode_criar_usuarios_flag,
+        'pode_criar_propriedades': pode_criar_propriedades_flag,
     }
     
     return render(request, 'core/index.html', context)
@@ -213,6 +370,10 @@ def propriedades_list(request):
     search = request.GET.get('search', '')
     
     propriedades = PropriedadeRural.objects.filter(ativo=True)
+    
+    # Filtrar por níveis que o usuário pode visualizar
+    niveis_permitidos = obter_niveis_visualizacao(request.user)
+    propriedades = propriedades.filter(nivel_impacto__in=niveis_permitidos)
     
     if nivel_filtro:
         propriedades = propriedades.filter(nivel_impacto=nivel_filtro)
@@ -234,6 +395,8 @@ def propriedades_list(request):
         'page_obj': page_obj,
         'nivel_filtro': nivel_filtro,
         'search': search,
+        'pode_criar': pode_criar_propriedades(request.user),
+        'niveis_permitidos': niveis_permitidos,
     }
     return render(request, 'core/propriedades_list.html', context)
 
@@ -242,14 +405,38 @@ def propriedades_list(request):
 def propriedade_detail(request, pk):
     """Visualiza detalhes de uma propriedade"""
     propriedade = get_object_or_404(PropriedadeRural, pk=pk, ativo=True)
+    
+    # Verificar se usuário tem permissão para ver este nível
+    niveis_permitidos = obter_niveis_visualizacao(request.user)
+    if propriedade.nivel_impacto not in niveis_permitidos:
+        messages.error(request, 'Você não tem permissão para visualizar propriedades deste nível!')
+        return redirect('propriedades_list')
+    
     return render(request, 'core/propriedade_detail.html', {'propriedade': propriedade})
 
 
 @login_required
 def propriedade_create(request):
     """Cria uma nova propriedade"""
+    # Verificar se usuário pode criar propriedades
+    if not pode_criar_propriedades(request.user):
+        messages.error(request, 'Você não tem permissão para cadastrar propriedades!')
+        return redirect('propriedades_list')
+    
+    niveis_permitidos = obter_niveis_criacao(request.user)
+    
     if request.method == 'POST':
         try:
+            nivel_escolhido = int(request.POST.get('nivel_impacto'))
+            
+            # Validar se o nível escolhido é permitido
+            niveis_valores = [n[0] for n in niveis_permitidos]
+            if nivel_escolhido not in niveis_valores:
+                messages.error(request, 'Você não tem permissão para cadastrar propriedades neste nível!')
+                return render(request, 'core/propriedade_form.html', {
+                    'niveis_permitidos': niveis_permitidos
+                })
+            
             propriedade = PropriedadeRural(
                 nome_propriedade=request.POST.get('nome_propriedade'),
                 proprietario=request.POST.get('proprietario'),
@@ -259,7 +446,7 @@ def propriedade_create(request):
                 estado=request.POST.get('estado'),
                 area_hectares=request.POST.get('area_hectares'),
                 agrotoxico_utilizado=request.POST.get('agrotoxico_utilizado'),
-                nivel_impacto=request.POST.get('nivel_impacto'),
+                nivel_impacto=nivel_escolhido,
                 descricao_impacto=request.POST.get('descricao_impacto'),
                 data_identificacao=request.POST.get('data_identificacao'),
                 latitude=request.POST.get('latitude') or None,
@@ -272,7 +459,9 @@ def propriedade_create(request):
         except Exception as e:
             messages.error(request, f'Erro ao cadastrar propriedade: {str(e)}')
     
-    return render(request, 'core/propriedade_form.html')
+    return render(request, 'core/propriedade_form.html', {
+        'niveis_permitidos': niveis_permitidos
+    })
 
 
 @login_required
@@ -280,8 +469,26 @@ def propriedade_update(request, pk):
     """Atualiza uma propriedade existente"""
     propriedade = get_object_or_404(PropriedadeRural, pk=pk, ativo=True)
     
+    # Verificar se usuário pode ver/editar este nível
+    niveis_permitidos = obter_niveis_criacao(request.user)
+    niveis_valores = [n[0] for n in niveis_permitidos]
+    
+    if propriedade.nivel_impacto not in niveis_valores:
+        messages.error(request, 'Você não tem permissão para editar propriedades deste nível!')
+        return redirect('propriedades_list')
+    
     if request.method == 'POST':
         try:
+            nivel_escolhido = int(request.POST.get('nivel_impacto'))
+            
+            # Validar se o novo nível é permitido
+            if nivel_escolhido not in niveis_valores:
+                messages.error(request, 'Você não tem permissão para alterar para este nível!')
+                return render(request, 'core/propriedade_form.html', {
+                    'propriedade': propriedade,
+                    'niveis_permitidos': niveis_permitidos
+                })
+            
             propriedade.nome_propriedade = request.POST.get('nome_propriedade')
             propriedade.proprietario = request.POST.get('proprietario')
             propriedade.cpf_cnpj = request.POST.get('cpf_cnpj')
@@ -290,7 +497,7 @@ def propriedade_update(request, pk):
             propriedade.estado = request.POST.get('estado')
             propriedade.area_hectares = request.POST.get('area_hectares')
             propriedade.agrotoxico_utilizado = request.POST.get('agrotoxico_utilizado')
-            propriedade.nivel_impacto = request.POST.get('nivel_impacto')
+            propriedade.nivel_impacto = nivel_escolhido
             propriedade.descricao_impacto = request.POST.get('descricao_impacto')
             propriedade.data_identificacao = request.POST.get('data_identificacao')
             propriedade.latitude = request.POST.get('latitude') or None
@@ -302,7 +509,10 @@ def propriedade_update(request, pk):
         except Exception as e:
             messages.error(request, f'Erro ao atualizar propriedade: {str(e)}')
     
-    return render(request, 'core/propriedade_form.html', {'propriedade': propriedade})
+    return render(request, 'core/propriedade_form.html', {
+        'propriedade': propriedade,
+        'niveis_permitidos': niveis_permitidos
+    })
 
 
 @login_required
@@ -346,6 +556,7 @@ def usuarios_list(request):
     context = {
         'page_obj': page_obj,
         'search': search,
+        'pode_criar': pode_criar_usuarios(request.user),
     }
     return render(request, 'core/usuarios_list.html', context)
 
@@ -359,6 +570,10 @@ def usuario_detail(request, pk):
 
 def usuario_create(request):
     """Cria um novo usuário com foto"""
+    # Verificar se é um usuário autenticado criando outro usuário
+    is_admin_creating = request.user.is_authenticated and pode_criar_usuarios(request.user)
+    perfis_permitidos = obter_perfis_permitidos(request.user) if is_admin_creating else []
+    
     if request.method == 'POST':
         try:
             # Dados do usuário
@@ -372,11 +587,17 @@ def usuario_create(request):
             # Validações
             if password != password_confirm:
                 messages.error(request, 'As senhas não coincidem!')
-                return render(request, 'core/usuario_form.html')
+                return render(request, 'core/usuario_form.html', {
+                    'is_admin_creating': is_admin_creating,
+                    'perfis_permitidos': perfis_permitidos
+                })
             
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'Nome de usuário já existe!')
-                return render(request, 'core/usuario_form.html')
+                return render(request, 'core/usuario_form.html', {
+                    'is_admin_creating': is_admin_creating,
+                    'perfis_permitidos': perfis_permitidos
+                })
             
             # Criar usuário
             user = User.objects.create_user(
@@ -389,8 +610,23 @@ def usuario_create(request):
             
             # Atualizar perfil
             perfil = user.perfil
-            # Novos cadastros sempre são Usuário Comum
-            perfil.tipo_perfil = 'COMUM'
+            
+            # Determinar tipo de perfil
+            if is_admin_creating:
+                # Usuário logado com permissão pode escolher o tipo
+                tipo_perfil_escolhido = request.POST.get('tipo_perfil', 'COMUM')
+                
+                # Validar se o tipo escolhido é permitido para este usuário
+                perfis_valores = [p[0] for p in perfis_permitidos]
+                if tipo_perfil_escolhido in perfis_valores:
+                    perfil.tipo_perfil = tipo_perfil_escolhido
+                else:
+                    perfil.tipo_perfil = 'COMUM'
+                    messages.warning(request, 'Tipo de perfil inválido. Definido como Usuário Comum.')
+            else:
+                # Auto-cadastro: sempre é Usuário Comum
+                perfil.tipo_perfil = 'COMUM'
+            
             perfil.telefone = request.POST.get('telefone', '')
             perfil.cpf = request.POST.get('cpf', '') or None
             perfil.data_nascimento = request.POST.get('data_nascimento') or None
@@ -410,7 +646,11 @@ def usuario_create(request):
             
             messages.success(request, f'Usuário {username} cadastrado com sucesso!')
             
-            # Fazer login automático
+            # Se for admin criando, redireciona para lista
+            if is_admin_creating:
+                return redirect('usuarios_list')
+            
+            # Se for auto-cadastro, faz login automático
             user_authenticated = authenticate(username=username, password=password)
             if user_authenticated:
                 login(request, user_authenticated)
@@ -423,7 +663,10 @@ def usuario_create(request):
         except Exception as e:
             messages.error(request, f'Erro ao cadastrar usuário: {str(e)}')
     
-    return render(request, 'core/usuario_form.html')
+    return render(request, 'core/usuario_form.html', {
+        'is_admin_creating': is_admin_creating,
+        'perfis_permitidos': perfis_permitidos
+    })
 
 
 @login_required

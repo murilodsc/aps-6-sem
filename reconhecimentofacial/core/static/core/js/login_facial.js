@@ -203,17 +203,25 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Falha no reconhecimento
                 isProcessing = false;
-                showMessage(`❌ ${data.message}`, 'error');
-                tryAgainBtn.style.display = 'inline-block';
+                showMessage(`❌ ${data.message}<br>Tentando novamente em 3 segundos...`, 'error');
                 faceOverlay.classList.remove('face-detected');
+                
+                // Reiniciar automaticamente após 3 segundos
+                setTimeout(() => {
+                    tryAgain();
+                }, 3000);
             }
         } catch (error) {
             processing.classList.remove('active');
             isProcessing = false;
             console.error('Erro:', error);
-            showMessage('Erro ao processar reconhecimento. Tente novamente.', 'error');
-            tryAgainBtn.style.display = 'inline-block';
+            showMessage('Erro ao processar reconhecimento. Tentando novamente em 3 segundos...', 'error');
             faceOverlay.classList.remove('face-detected');
+            
+            // Reiniciar automaticamente após 3 segundos
+            setTimeout(() => {
+                tryAgain();
+            }, 3000);
         }
     }
 

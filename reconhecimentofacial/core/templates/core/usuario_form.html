@@ -149,8 +149,26 @@
           <small class="text-muted">Apenas administradores podem alterar o tipo de perfil</small>
         </div>
       </div>
+      {% elif is_admin_creating and perfis_permitidos %}
+      <!-- Admin/Ministro/Diretor criando novo usuário - pode escolher o tipo -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipo_perfil">Tipo de Perfil *</label>
+          <select
+            id="tipo_perfil"
+            name="tipo_perfil"
+            required
+            class="select-input"
+          >
+            {% for valor, label in perfis_permitidos %}
+            <option value="{{ valor }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <small class="text-muted">Selecione o tipo de perfil para o novo usuário</small>
+        </div>
+      </div>
       {% else %}
-      <!-- Novo cadastro - sempre será Usuário Comum (campo oculto) -->
+      <!-- Novo cadastro (auto-cadastro) - sempre será Usuário Comum (campo oculto) -->
       <input type="hidden" name="tipo_perfil" value="COMUM" />
       <div class="form-row">
         <div class="form-group">

@@ -184,10 +184,17 @@
                     <label for="nivel_impacto">Nível de Impacto Ambiental *</label>
                     <select id="nivel_impacto" name="nivel_impacto" required>
                         <option value="">Selecione</option>
-                        <option value="1" {% if propriedade.nivel_impacto == 1 %}selected{% endif %}>Nível 1 - Baixo Impacto</option>
-                        <option value="2" {% if propriedade.nivel_impacto == 2 %}selected{% endif %}>Nível 2 - Médio Impacto</option>
-                        <option value="3" {% if propriedade.nivel_impacto == 3 %}selected{% endif %}>Nível 3 - Alto Impacto</option>
+                        {% for nivel_valor, nivel_label in niveis_permitidos %}
+                        <option value="{{ nivel_valor }}" {% if propriedade.nivel_impacto == nivel_valor %}selected{% endif %}>
+                            {{ nivel_label }}
+                        </option>
+                        {% endfor %}
                     </select>
+                    {% if niveis_permitidos|length == 0 %}
+                    <small class="text-danger">Você não tem permissão para cadastrar propriedades.</small>
+                    {% elif niveis_permitidos|length < 3 %}
+                    <small class="text-muted">Você só pode cadastrar propriedades nos níveis permitidos para o seu perfil.</small>
+                    {% endif %}
                 </div>
             </div>
 

@@ -4,7 +4,9 @@ Sistema {% endblock %} {% block extra_styles %}
 {% endblock %} {% block content %}
 <div class="page-header">
   <h1>👥 Usuários do Sistema</h1>
+  {% if pode_criar %}
   <a href="{% url 'usuario_create' %}" class="btn-primary"> + Novo Usuário </a>
+  {% endif %}
 </div>
 
 <div class="filters-container">

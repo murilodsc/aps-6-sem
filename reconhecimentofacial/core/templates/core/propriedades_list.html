@@ -10,9 +10,11 @@
 {% block content %}
 <div class="page-header">
     <h1>🌾 Propriedades Rurais com Agrotóxicos Proibidos</h1>
+    {% if pode_criar %}
     <a href="{% url 'propriedade_create' %}" class="btn-primary">
         + Nova Propriedade
     </a>
+    {% endif %}
 </div>
 
 <div class="filters-container">
@@ -30,9 +32,15 @@
         <div class="filter-group">
             <select name="nivel" class="filter-select">
                 <option value="">Todos os Níveis</option>
+                {% if 1 in niveis_permitidos %}
                 <option value="1" {% if nivel_filtro == '1' %}selected{% endif %}>Nível 1 - Baixo Impacto</option>
+                {% endif %}
+                {% if 2 in niveis_permitidos %}
                 <option value="2" {% if nivel_filtro == '2' %}selected{% endif %}>Nível 2 - Médio Impacto</option>
+                {% endif %}
+                {% if 3 in niveis_permitidos %}
                 <option value="3" {% if nivel_filtro == '3' %}selected{% endif %}>Nível 3 - Alto Impacto</option>
+                {% endif %}
             </select>
         </div>
         

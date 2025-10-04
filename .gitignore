@@ -88,3 +88,10 @@ celerybeat.pid
 
 # Sphinx documentation
 docs/_build/
+
+# AWS keys
+*.pem
+
+# Backup files
+*.bak
+*.backup

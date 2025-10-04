@@ -7,9 +7,11 @@
 {% block content %}
 <div class="page-header">
   <h1>🏠 Dashboard</h1>
+  {% if pode_criar_propriedades %}
   <a href="{% url 'propriedade_create' %}" class="btn-primary">
     🆕 Nova Propriedade
   </a>
+  {% endif %}
 </div>
 
 <!-- Cards de Estatísticas -->
@@ -49,17 +51,21 @@
       <p>Gerenciar propriedades rurais</p>
     </a>
 
+    {% if pode_criar_usuarios %}
     <a href="{% url 'usuario_create' %}" class="menu-card">
       <div class="menu-icon">➕</div>
       <h3>Novo Usuário</h3>
       <p>Cadastrar novo usuário</p>
     </a>
+    {% endif %}
 
+    {% if pode_criar_propriedades %}
     <a href="{% url 'propriedade_create' %}" class="menu-card">
       <div class="menu-icon">🆕</div>
       <h3>Nova Propriedade</h3>
       <p>Registrar nova propriedade</p>
     </a>
+    {% endif %}
 
     {% if request.user.is_staff %}
     <a href="/admin/" class="menu-card">
