@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %} {% load static %} {% block title %}Confirmar
+Exclusão - {{ usuario_perfil.username }}{% endblock %} {% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/usuarios.css' %}" />
+{% endblock %} {% block content %}
+<div class="delete-container">
+  <div class="delete-card">
+    <div class="delete-icon">⚠️</div>
+    <h2>Confirmar Exclusão</h2>
+    <p class="delete-warning">
+      Tem certeza que deseja excluir o usuário
+      <strong>{{ usuario_perfil.username }}</strong>?
+    </p>
+
+    <div class="delete-info">
+      <p><strong>Nome:</strong> {{ usuario_perfil.get_full_name }}</p>
+      <p><strong>Usuário:</strong> @{{ usuario_perfil.username }}</p>
+      <p><strong>Email:</strong> {{ usuario_perfil.email }}</p>
+      <p>
+        <strong>Cadastrado em:</strong> {{
+        usuario_perfil.date_joined|date:"d/m/Y" }}
+      </p>
+    </div>
+
+    <p class="delete-note">
+      <strong>Atenção:</strong> Esta ação não pode ser desfeita. Todos os dados
+      do usuário serão permanentemente removidos.
+    </p>
+
+    <form method="post" class="delete-form">
+      {% csrf_token %}
+      <div class="delete-actions">
+        <button type="submit" class="btn-danger">🗑️ Sim, Excluir</button>
+        <a
+          href="{% url 'usuario_detail' usuario_perfil.pk %}"
+          class="btn-secondary"
+        >
+          ✖ Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

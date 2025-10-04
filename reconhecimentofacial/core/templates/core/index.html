@@ -1,43 +1,156 @@
-{% extends 'core/base.html' %} {% load static %} {% block title %}Home -
-Reconhecimento Facial{% endblock %} {% block extra_styles %}
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Home - Sistema de Gestão{% endblock %}
+{% block extra_styles %}
 <link rel="stylesheet" href="{% static 'core/css/index.css' %}" />
-{% endblock %} {% block content %}
+{% endblock %}
+{% block content %}
 <div class="page-header">
-  <h1>Sistema de Reconhecimento Facial</h1>
-  <a href="{% url 'capturar_foto' %}" class="btn-primary">
-    Capturar Nova Foto
+  <h1>🏠 Dashboard</h1>
+  <a href="{% url 'propriedade_create' %}" class="btn-primary">
+    🆕 Nova Propriedade
   </a>
 </div>
 
-{% if fotos %}
+<!-- Cards de Estatísticas -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">👥</div>
+    <div class="stat-info">
+      <h3>{{ total_usuarios }}</h3>
+      <p>Usuários Cadastrados</p>
+      <a href="{% url 'usuarios_list' %}" class="stat-link">Ver todos →</a>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">🌾</div>
+    <div class="stat-info">
+      <h3>{{ total_propriedades }}</h3>
+      <p>Propriedades Registradas</p>
+      <a href="{% url 'propriedades_list' %}" class="stat-link">Ver todas →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Menus Rápidos -->
+<div class="quick-menu">
+  <h2>⚡ Acesso Rápido</h2>
+  <div class="menu-grid">
+    <a href="{% url 'usuarios_list' %}" class="menu-card">
+      <div class="menu-icon">👥</div>
+      <h3>Usuários</h3>
+      <p>Gerenciar usuários do sistema</p>
+    </a>
+
+    <a href="{% url 'propriedades_list' %}" class="menu-card">
+      <div class="menu-icon">🌾</div>
+      <h3>Propriedades</h3>
+      <p>Gerenciar propriedades rurais</p>
+    </a>
+
+    <a href="{% url 'usuario_create' %}" class="menu-card">
+      <div class="menu-icon">➕</div>
+      <h3>Novo Usuário</h3>
+      <p>Cadastrar novo usuário</p>
+    </a>
+
+    <a href="{% url 'propriedade_create' %}" class="menu-card">
+      <div class="menu-icon">🆕</div>
+      <h3>Nova Propriedade</h3>
+      <p>Registrar nova propriedade</p>
+    </a>
+
+    {% if request.user.is_staff %}
+    <a href="/admin/" class="menu-card">
+      <div class="menu-icon">⚙️</div>
+      <h3>Administração</h3>
+      <p>Painel administrativo</p>
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Últimas Propriedades -->
+{% if ultimas_propriedades %}
 <div class="card">
   <div class="card-header">
-    <h3>Últimas Fotos Capturadas</h3>
+    <h3>🌾 Últimas Propriedades Cadastradas</h3>
+    <a href="{% url 'propriedades_list' %}" class="btn-secondary">Ver todas</a>
   </div>
   <div class="card-body">
-    <div class="photo-grid">
-      {% for foto in fotos %}
-      <div class="photo-card">
-        <img src="{{ foto.imagem.url }}" alt="Foto de {{ foto.nome }}" />
-        <div class="photo-info">
-          <h5>{{ foto.nome }}</h5>
-          <p class="text-muted">
-            Capturada em: {{ foto.data_captura|date:"d/m/Y H:i" }}
-          </p>
+    <div class="list-recent">
+      {% for propriedade in ultimas_propriedades %}
+      <div class="recent-item">
+        <div class="recent-info">
+          <h4>{{ propriedade.nome_propriedade }}</h4>
+          <div class="user-badges-home">
+            {% if propriedade.usuario_cadastro %}
+            <span class="badge-perfil-home badge-perfil-{{ propriedade.usuario_cadastro.perfil.tipo_perfil|lower }}">
+              {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display_icon }} {{ propriedade.usuario_cadastro.get_full_name|default:propriedade.usuario_cadastro.username }}
+            </span>
+            {% if propriedade.usuario_cadastro.is_staff %}
+            <span class="badge-admin-home">👑 Admin</span>
+            {% endif %}
+            {% endif %}
+          </div>
+          <p>{{ propriedade.proprietario }} - {{ propriedade.cidade }}/{{ propriedade.estado }}</p>
+          <small>Cadastrado em {{ propriedade.data_cadastro|date:"d/m/Y H:i" }}</small>
+        </div>
+        <div class="recent-actions">
+          <span class="badge badge-nivel-{{ propriedade.nivel_impacto }}">
+            Nível {{ propriedade.nivel_impacto }}
+          </span>
+          <a href="{% url 'propriedade_detail' propriedade.pk %}" class="btn-action">Ver</a>
         </div>
       </div>
       {% endfor %}
     </div>
   </div>
 </div>
-{% else %}
+{% endif %}
+
+<!-- Últimos Usuários (apenas para administradores) -->
+{% if ultimos_usuarios %}
 <div class="card">
-  <div class="card-body empty-state">
-    <h3>Nenhuma foto capturada ainda</h3>
-    <p>Clique no botão acima para capturar sua primeira foto!</p>
-    <a href="{% url 'capturar_foto' %}" class="btn-primary">
-      Capturar Primeira Foto
-    </a>
+  <div class="card-header">
+    <h3>👥 Últimos Usuários Cadastrados</h3>
+    <a href="{% url 'usuarios_list' %}" class="btn-secondary">Ver todos</a>
+  </div>
+  <div class="card-body">
+    <div class="list-recent">
+      {% for usuario in ultimos_usuarios %}
+      <div class="recent-item">
+        <div class="recent-info">
+          <div class="user-avatar-small">
+            {% if usuario.perfil.foto %}
+            <img src="{{ usuario.perfil.foto.url }}" alt="{{ usuario.get_full_name }}">
+            {% else %}
+            <div class="avatar-placeholder">{{ usuario.first_name.0|default:usuario.username.0|upper }}</div>
+            {% endif %}
+          </div>
+          <div>
+            <h4>{{ usuario.get_full_name|default:usuario.username }}</h4>
+            <div class="user-badges-home">
+              <span class="badge-perfil-home badge-perfil-{{ usuario.perfil.tipo_perfil|lower }}">
+                {{ usuario.perfil.get_tipo_perfil_display_icon }} {{ usuario.perfil.get_tipo_perfil_display }}
+              </span>
+              {% if usuario.is_staff %}
+              <span class="badge-admin-home">👑 Admin</span>
+              {% endif %}
+            </div>
+            <p>@{{ usuario.username }} - {{ usuario.email }}</p>
+            <small>Cadastrado em {{ usuario.date_joined|date:"d/m/Y H:i" }}</small>
+          </div>
+        </div>
+        <div class="recent-actions">
+          <a href="{% url 'usuario_detail' usuario.pk %}" class="btn-action">Ver</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 </div>
-{% endif %} {% endblock %}
+{% endif %}
+
+{% endblock %}

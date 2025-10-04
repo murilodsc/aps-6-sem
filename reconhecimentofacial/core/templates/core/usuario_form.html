@@ -1,0 +1,304 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}
+{% if usuario_perfil %}Editar{% else %}Novo{% endif %} Usuário
+{% endblock %}
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'core/css/usuarios.css' %}" />
+{% endblock %} {% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h2>
+      {% if usuario_perfil %}✏️ Editar Usuário{% else %}➕ Novo Usuário{% endif %}
+    </h2>
+    <p>
+      {% if not usuario_perfil %}Cadastre-se e capture sua foto{% else %}Atualize suas informações{% endif %}
+    </p>
+  </div>
+
+  <form method="post" class="user-form" id="userForm">
+    {% csrf_token %}
+
+    <div class="form-section">
+      <h3>📸 Foto do Perfil</h3>
+
+      <div class="photo-capture-section">
+        <div class="current-photo">
+          {% if usuario_perfil.perfil.foto %}
+          <img
+            src="{{ usuario_perfil.perfil.foto.url }}"
+            alt="Foto atual"
+            id="previewImage"
+          />
+          {% else %}
+          <div class="photo-placeholder" id="previewImage">
+            <span>📷</span>
+            <p>Sem foto</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="camera-section">
+          <video id="video" autoplay style="display: none"></video>
+          <canvas id="canvas" style="display: none"></canvas>
+          <input type="file" id="fileInput" accept="image/*" style="display: none" />
+
+          <div class="camera-buttons">
+            <button type="button" id="startCamera" class="btn-secondary">
+              📷 Abrir Câmera
+            </button>
+            <button type="button" id="selectFile" class="btn-secondary">
+              🖼️ Selecionar Foto
+            </button>
+            <button
+              type="button"
+              id="capturePhoto"
+              class="btn-primary"
+              style="display: none"
+            >
+              📸 Capturar Foto
+            </button>
+            <button
+              type="button"
+              id="retakePhoto"
+              class="btn-warning"
+              style="display: none"
+            >
+              🔄 Tirar Novamente
+            </button>
+            {% if usuario_perfil.perfil.foto %}
+            <button type="button" id="deletePhoto" class="btn-danger">
+              🗑️ Deletar Foto
+            </button>
+            {% endif %}
+          </div>
+        </div>
+
+        <input type="hidden" id="foto_base64" name="foto_base64" />
+        <input type="hidden" id="delete_foto" name="delete_foto" value="" />
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>👤 Dados de Acesso</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="username">Nome de Usuário *</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            {% if usuario_perfil %}readonly{% endif %}
+            value="{% if usuario_perfil %}{{ usuario_perfil.username }}{% endif %}"
+            placeholder="ex: joao.silva"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            value="{% if usuario_perfil %}{{ usuario_perfil.email }}{% endif %}"
+            placeholder="ex: joao@email.com"
+          />
+        </div>
+      </div>
+
+      {% if usuario_perfil and request.user.is_staff %}
+      <!-- Apenas admin pode alterar o tipo de perfil -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipo_perfil">Tipo de Perfil *</label>
+          <select
+            id="tipo_perfil"
+            name="tipo_perfil"
+            required
+            class="select-input"
+          >
+            <option value="COMUM" {% if usuario_perfil and usuario_perfil.perfil.tipo_perfil == 'COMUM' %}selected{% endif %}>
+              👤 Usuário Comum
+            </option>
+            <option value="DIRETOR" {% if usuario_perfil and usuario_perfil.perfil.tipo_perfil == 'DIRETOR' %}selected{% endif %}>
+              👔 Diretor de Divisões
+            </option>
+            <option value="MINISTRO" {% if usuario_perfil and usuario_perfil.perfil.tipo_perfil == 'MINISTRO' %}selected{% endif %}>
+              🎖️ Ministro do Meio Ambiente
+            </option>
+          </select>
+        </div>
+      </div>
+      {% elif usuario_perfil %}
+      <!-- Usuário comum editando seu próprio perfil - mostra mas não permite alterar -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipo_perfil_display">Tipo de Perfil</label>
+          <input
+            type="text"
+            id="tipo_perfil_display"
+            class="input-readonly"
+            value="{{ usuario_perfil.perfil.get_tipo_perfil_display_icon }} {{ usuario_perfil.perfil.get_tipo_perfil_display }}"
+            readonly
+            disabled
+          />
+          <input type="hidden" name="tipo_perfil" value="{{ usuario_perfil.perfil.tipo_perfil }}" />
+          <small class="text-muted">Apenas administradores podem alterar o tipo de perfil</small>
+        </div>
+      </div>
+      {% else %}
+      <!-- Novo cadastro - sempre será Usuário Comum (campo oculto) -->
+      <input type="hidden" name="tipo_perfil" value="COMUM" />
+      <div class="form-row">
+        <div class="form-group">
+          <div class="info-box">
+            <p>🎯 <strong>Seu perfil inicial:</strong> Usuário Comum</p>
+            <small>Você será cadastrado como Usuário Comum. Para outros tipos de perfil, entre em contato com um administrador.</small>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="form-row">
+        <div class="form-group">
+          <label
+            for="{% if usuario_perfil %}new_password{% else %}password{% endif %}"
+          >
+            {% if usuario_perfil %}Nova Senha (deixe em branco para manter){% else %}Senha *{% endif %}
+          </label>
+          <input
+            type="password"
+            id="{% if usuario_perfil %}new_password{% else %}password{% endif %}"
+            name="{% if usuario_perfil %}new_password{% else %}password{% endif %}"
+            {% if not usuario_perfil %}required{% endif %}
+            placeholder="Digite a senha"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password_confirm">
+            {% if usuario_perfil %}Confirmar Nova Senha{% else %}Confirmar Senha
+            *{% endif %}
+          </label>
+          <input
+            type="password"
+            id="password_confirm"
+            name="password_confirm"
+            {% if not usuario_perfil %}required{% endif %}
+            placeholder="Confirme a senha"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>📋 Informações Pessoais</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">Nome *</label>
+          <input
+            type="text"
+            id="first_name"
+            name="first_name"
+            required
+            value="{% if usuario_perfil %}{{ usuario_perfil.first_name }}{% endif %}"
+            placeholder="ex: João"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Sobrenome *</label>
+          <input
+            type="text"
+            id="last_name"
+            name="last_name"
+            required
+            value="{% if usuario_perfil %}{{ usuario_perfil.last_name }}{% endif %}"
+            placeholder="ex: Silva"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input
+            type="text"
+            id="cpf"
+            name="cpf"
+            value="{% if usuario_perfil %}{{ usuario_perfil.perfil.cpf }}{% endif %}"
+            placeholder="000.000.000-00"
+            maxlength="14"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input
+            type="text"
+            id="telefone"
+            name="telefone"
+            value="{% if usuario_perfil %}{{ usuario_perfil.perfil.telefone }}{% endif %}"
+            placeholder="(00) 00000-0000"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="data_nascimento">Data de Nascimento</label>
+        <input
+          type="date"
+          id="data_nascimento"
+          name="data_nascimento"
+          value="{% if usuario_perfil.perfil.data_nascimento %}{{ usuario_perfil.perfil.data_nascimento|date:'Y-m-d' }}{% endif %}"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <textarea
+          id="endereco"
+          name="endereco"
+          rows="2"
+          placeholder="Rua, número, bairro, cidade - UF"
+        >
+{% if usuario_perfil %}{{ usuario_perfil.perfil.endereco }}{% endif %}</textarea
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="bio">Biografia</label>
+        <textarea
+          id="bio"
+          name="bio"
+          rows="3"
+          maxlength="500"
+          placeholder="Conte um pouco sobre você..."
+        >
+{% if usuario_perfil %}{{ usuario_perfil.perfil.bio }}{% endif %}</textarea
+        >
+        <small class="form-help">Máximo 500 caracteres</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">
+        {% if usuario_perfil %}💾 Salvar Alterações{% else %}➕ Cadastrar{% endif %}
+      </button>
+      <a
+        href="{% if usuario_perfil %}{% url 'usuario_detail' usuario_perfil.pk %}{% else %}{% url 'login' %}{% endif %}"
+        class="btn-secondary"
+      >
+        ✖ Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+
+{% endblock %} {% block scripts %}
+<script src="{% static 'core/js/usuario_form.js' %}"></script>
+{% endblock %}

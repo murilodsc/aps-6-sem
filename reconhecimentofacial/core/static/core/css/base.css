@@ -39,6 +39,50 @@ body {
   align-items: center;
 }
 
+.user-info-navbar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.welcome-message {
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+
+.badge-perfil-nav {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+.badge-perfil-comum {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.badge-perfil-diretor {
+  background: #ddd6fe;
+  color: #5b21b6;
+}
+
+.badge-perfil-ministro {
+  background: #fef3c7;
+  color: #92400e;
+  border: 2px solid #f59e0b;
+}
+
 .nav-link {
   color: #666;
   text-decoration: none;

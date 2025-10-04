@@ -122,3 +122,22 @@ body {
   font-size: 12px;
   color: #999;
 }
+
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.register-link a {
+  color: #1a1a1a;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.register-link a:hover {
+  color: #333;
+  text-decoration: underline;
+}

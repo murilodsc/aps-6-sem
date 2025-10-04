@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Reconhecimento Facial{% endblock %}</title>
+    <title>{% block title %}Sistema de Gestão{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'core/css/base.css' %}" />
     {% block extra_styles %}{% endblock %}
   </head>
@@ -12,14 +12,23 @@
     <nav class="navbar">
       <div class="navbar-container">
         <a class="navbar-brand" href="{% url 'index' %}"
-          >Reconhecimento Facial</a
+          >Sistema de Gestão</a
         >
         <div class="navbar-nav">
           {% if user.is_authenticated %}
-          <!--                    <span class="navbar-text">Olá, {{ user.username }}</span>-->
-
+          <div class="user-info-navbar">
+            <span class="welcome-message">
+              Bem-vindo, {{ user.get_full_name|default:user.username }}!
+            </span>
+            <span class="badge-perfil-nav badge-perfil-{{ user.perfil.tipo_perfil|lower }}">
+              {{ user.perfil.get_tipo_perfil_display_icon }} {{ user.perfil.get_tipo_perfil_display }}
+            </span>
+          </div>
           <a class="nav-link" href="{% url 'index' %}">Home</a>
-          <a class="nav-link" href="{% url 'capturar_foto' %}">Capturar Foto</a>
+          <a class="nav-link" href="{% url 'propriedades_list' %}"
+            >Propriedades</a
+          >
+          <a class="nav-link" href="{% url 'usuarios_list' %}">Usuários</a>
           <a class="btn-logout" href="{% url 'logout' %}">Sair</a>
           {% else %}
           <a class="btn-login" href="{% url 'login' %}">Entrar</a>
