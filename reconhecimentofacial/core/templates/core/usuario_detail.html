@@ -1,7 +1,12 @@
-{% extends 'core/base.html' %} {% load static %} {% block title %} {{
-usuario_perfil.get_full_name }} - Perfil {% endblock %} {% block extra_styles %}
-<link rel="stylesheet" href="{% static 'core/css/usuarios.css' %}" />
-{% endblock %} {% block content %}
+{% extends 'core/base.html' %} 
+{% load static %} 
+{% block title %} 
+  {{usuario_perfil.get_full_name }} - Perfil
+{% endblock %} 
+{% block extra_styles %}
+  <link rel="stylesheet" href="{% static 'core/css/usuarios.css' %}" />
+{% endblock %} 
+{% block content %}
 <div class="detail-container">
   <div class="detail-header">
     <div class="header-user-info">
@@ -115,9 +120,11 @@ usuario_perfil.get_full_name }} - Perfil {% endblock %} {% block extra_styles %}
         <div class="info-item">
           <span class="info-label">Último Login:</span>
           <span class="info-value">
-            {% if usuario_perfil.last_login %} {{
-            usuario_perfil.last_login|date:"d/m/Y H:i" }} {% else %} Nunca
-            acessou {% endif %}
+            {% if usuario_perfil.last_login %} 
+            {{ usuario_perfil.last_login|date:"d/m/Y H:i" }} 
+            {% else %} 
+            Nunca acessou 
+            {% endif %}
           </span>
         </div>
         <div class="info-item">

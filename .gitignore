@@ -7,9 +7,22 @@
 *.so
 .Python
 __pycache__/
+*/__pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.pdb
+
+# Python cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
 
 # Django
 *.log
@@ -20,6 +33,10 @@ db.sqlite3-journal
 /media
 /staticfiles
 /static
+
+# Django cache
+django_cache/
+*.log.*
 
 # Virtual Environment
 venv/
@@ -36,6 +53,14 @@ venv.bak/
 *.swo
 *~
 .DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
 
 # Testing
 .pytest_cache/
@@ -43,6 +68,9 @@ venv.bak/
 htmlcov/
 .tox/
 .hypothesis/
+.nox/
+coverage.xml
+*.cover
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -69,6 +97,22 @@ wheels/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Node.js (caso use npm/yarn)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+.node_repl_history
+*.tsbuildinfo
+
+# OS cache
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
 # Pyre
 .pyre/
