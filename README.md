@@ -52,8 +52,6 @@ perfil = PerfilUsuario.objects.create(
 
 ### 2️⃣ Processo de Login Facial
 
-<img src="https://via.placeholder.com/800x400/4A90E2/FFFFFF?text=1.+Usuário+acessa+login+facial+→+2.+Câmera+captura+rosto+→+3.+IA+compara+com+banco+→+4.+Login+automático" alt="Fluxo de Login Facial" width="100%"/>
-
 #### Fluxo Técnico:
 
 1. **Captura**: Usuário acessa `/login-facial/` e autoriza uso da câmera
