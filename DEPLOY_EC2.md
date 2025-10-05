@@ -241,7 +241,7 @@ Acesse: `http://seu-ip-ec2:8000`
 sudo nano /etc/systemd/system/gunicorn.service
 ```
 
-Adicione:
+Adicione (ajuste os caminhos conforme sua estrutura):
 
 ```ini
 [Unit]
@@ -251,16 +251,20 @@ After=network.target
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/APS6-2.0/reconhecimentofacial
-Environment="PATH=/home/ubuntu/APS6-2.0/.venv/bin"
-ExecStart=/home/ubuntu/APS6-2.0/.venv/bin/gunicorn \
+WorkingDirectory=/home/ubuntu/aps-6-sem/reconhecimentofacial
+Environment="PATH=/home/ubuntu/aps-6-sem/.venv/bin"
+ExecStart=/home/ubuntu/aps-6-sem/.venv/bin/gunicorn \
     --workers 3 \
-    --bind unix:/home/ubuntu/APS6-2.0/reconhecimentofacial/gunicorn.sock \
+    --bind unix:/home/ubuntu/aps-6-sem/reconhecimentofacial/gunicorn.sock \
     reconhecimentofacial.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+**⚠️ IMPORTANTE**: Ajuste os caminhos se sua estrutura for diferente:
+- Se `.venv` está em `/home/ubuntu/aps-6-sem/.venv` ✅
+- Se projeto Django está em `/home/ubuntu/aps-6-sem/reconhecimentofacial` ✅
 
 ### 6.3 Iniciar e habilitar o serviço
 

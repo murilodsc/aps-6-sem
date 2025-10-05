@@ -1,8 +1,10 @@
-{% extends 'core/base.html' %} {% load static %} {% block title %}Confirmar
-Exclusão - {{ propriedade.nome_propriedade }}{% endblock %} {% block
-extra_styles %}
-<link rel="stylesheet" href="{% static 'core/css/propriedades.css' %}" />
-{% endblock %} {% block content %}
+{% extends 'core/base.html' %} 
+{% load static %} 
+{% block title %}Confirmar Exclusão - {{ propriedade.nome_propriedade }}{% endblock %} 
+{% block extra_styles %}
+  <link rel="stylesheet" href="{% static 'core/css/propriedades.css' %}" />
+{% endblock %} 
+{% block content %}
 <div class="delete-container">
   <div class="delete-card">
     <div class="delete-icon">⚠️</div>
