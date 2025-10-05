@@ -149,3 +149,6 @@ deploy/nginx.conf
 deploy/gunicorn.service
 /etc/nginx/
 /etc/systemd/
+
+# Deployment documentation (contains server-specific info)
+DEPLOY_EC2.md
