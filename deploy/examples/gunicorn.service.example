@@ -1,0 +1,42 @@
+# EXEMPLO de serviço systemd para Gunicorn
+#
+# INSTRUÇÕES:
+# 1. Copie este arquivo para o servidor EC2
+# 2. Edite os valores marcados com AJUSTAR:
+# 3. Salve em /etc/systemd/system/gunicorn.service
+# 4. Recarregue daemon: sudo systemctl daemon-reload
+# 5. Inicie: sudo systemctl start gunicorn
+# 6. Habilite: sudo systemctl enable gunicorn
+# 7. Verifique: sudo systemctl status gunicorn
+
+[Unit]
+Description=Gunicorn daemon for Django Reconhecimento Facial
+After=network.target
+
+[Service]
+# AJUSTAR: Se usar outro usuário, altere aqui
+User=ubuntu
+Group=www-data
+
+# AJUSTAR: Caminho para o diretório do projeto Django (onde está manage.py)
+WorkingDirectory=/caminho/para/seu/projeto/reconhecimentofacial
+
+# AJUSTAR: Caminho para o ambiente virtual
+Environment="PATH=/caminho/para/seu/projeto/.venv/bin"
+
+# AJUSTAR: Caminhos completos para gunicorn e socket
+ExecStart=/caminho/para/seu/projeto/.venv/bin/gunicorn \
+    --workers 3 \
+    --bind unix:/caminho/para/seu/projeto/reconhecimentofacial/gunicorn.sock \
+    reconhecimentofacial.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+# EXEMPLO para uso com aps-6-sem no EC2:
+# WorkingDirectory=/home/ubuntu/aps-6-sem/reconhecimentofacial
+# Environment="PATH=/home/ubuntu/aps-6-sem/.venv/bin"
+# ExecStart=/home/ubuntu/aps-6-sem/.venv/bin/gunicorn \
+#     --workers 3 \
+#     --bind unix:/home/ubuntu/aps-6-sem/reconhecimentofacial/gunicorn.sock \
+#     reconhecimentofacial.wsgi:application

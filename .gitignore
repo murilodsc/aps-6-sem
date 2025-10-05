@@ -139,3 +139,13 @@ docs/_build/
 # Backup files
 *.bak
 *.backup
+
+# Server configuration files (use .example instead)
+nginx.conf
+gunicorn.service
+*.sock
+*.pid
+deploy/nginx.conf
+deploy/gunicorn.service
+/etc/nginx/
+/etc/systemd/

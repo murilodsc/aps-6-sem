@@ -1,0 +1,54 @@
+# EXEMPLO de configuração Nginx para Django Reconhecimento Facial
+# 
+# INSTRUÇÕES:
+# 1. Copie este arquivo para o servidor EC2
+# 2. Edite os valores marcados com AJUSTAR:
+# 3. Salve em /etc/nginx/sites-available/reconhecimento
+# 4. Crie link simbólico: sudo ln -s /etc/nginx/sites-available/reconhecimento /etc/nginx/sites-enabled/
+# 5. Teste: sudo nginx -t
+# 6. Reinicie: sudo systemctl restart nginx
+
+server {
+    listen 80;
+    
+    # AJUSTAR: Coloque seu domínio e IP do EC2
+    server_name SEU-DOMINIO.com.br SEU-IP-EC2;
+
+    location = /favicon.ico { 
+        access_log off; 
+        log_not_found off; 
+    }
+    
+    # Arquivos estáticos (CSS, JS)
+    # AJUSTAR: Substitua /caminho/para/seu/projeto pelo caminho real
+    location /static/ {
+        alias /caminho/para/seu/projeto/reconhecimentofacial/staticfiles/;
+    }
+    
+    # Arquivos de mídia (fotos capturadas)
+    # AJUSTAR: Substitua /caminho/para/seu/projeto pelo caminho real
+    location /media/ {
+        alias /caminho/para/seu/projeto/reconhecimentofacial/media/;
+    }
+    
+    # Proxy para Gunicorn
+    location / {
+        include proxy_params;
+        
+        # AJUSTAR: Substitua /caminho/para/seu/projeto pelo caminho real
+        proxy_pass http://unix:/caminho/para/seu/projeto/reconhecimentofacial/gunicorn.sock;
+        
+        # Timeout maior para reconhecimento facial
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
+    
+    # Tamanho máximo de upload (para fotos)
+    client_max_body_size 10M;
+}
+
+# EXEMPLO para uso com aps-6-sem no EC2:
+# server_name aps6.murilocabral.com.br 34.201.44.178;
+# alias /home/ubuntu/aps-6-sem/reconhecimentofacial/staticfiles/;
+# alias /home/ubuntu/aps-6-sem/reconhecimentofacial/media/;
+# proxy_pass http://unix:/home/ubuntu/aps-6-sem/reconhecimentofacial/gunicorn.sock;

@@ -348,8 +348,17 @@ sudo apt install -y certbot python3-certbot-nginx
 ### 8.2 Obter certificado SSL
 
 ```bash
-sudo certbot --nginx -d seu-dominio.com
+sudo certbot --nginx -d aps6.murilocabral.com.br
 ```
+
+**⚠️ IMPORTANTE sobre arquivos de configuração:**
+
+Os arquivos `nginx.conf` e `gunicorn.service` são **específicos do servidor** e **NÃO devem** ser versionados no Git. Em vez disso:
+
+1. ✅ **Mantenha exemplos** em `deploy/examples/*.example`
+2. ✅ **Documente no README** como configurar
+3. ❌ **Nunca versione** arquivos com caminhos/IPs reais
+4. ❌ **Nunca versione** arquivos em `/etc/` do servidor
 
 ### 8.3 Renovação automática
 
@@ -480,7 +489,83 @@ sudo systemctl enable fail2ban
 
 ---
 
-## 🐛 13. Troubleshooting
+## � 15. Comandos Personalizados do Django
+
+### 15.1 Listar comandos disponíveis
+
+```bash
+cd /home/ubuntu/aps-6-sem/reconhecimentofacial
+source /home/ubuntu/aps-6-sem/.venv/bin/activate
+python manage.py help
+```
+
+### 15.2 Popular banco com 30 propriedades rurais
+
+O projeto inclui um comando personalizado para cadastrar 30 propriedades de teste:
+
+```bash
+# Cadastrar 30 propriedades (10 de cada nível: 1, 2 e 3)
+python manage.py popular_propriedades
+
+# Limpar banco e cadastrar novamente
+python manage.py popular_propriedades --limpar
+```
+
+**O comando cria:**
+- ✅ 10 propriedades de **Nível 1** (Baixo Impacto) - 10-100 hectares
+- ✅ 10 propriedades de **Nível 2** (Médio Impacto) - 100-500 hectares
+- ✅ 10 propriedades de **Nível 3** (Alto Impacto) - 500-2000 hectares
+
+**Dados gerados:**
+- Nomes de fazendas brasileiras realistas
+- Proprietários com nomes variados
+- CPF/CNPJ fictícios
+- Endereços com rodovias
+- Cidades e estados brasileiros
+- Coordenadas geográficas (latitude/longitude)
+- 15 tipos de agrotóxicos proibidos
+- Descrições de impacto por nível
+- Datas de identificação dos últimos 2 anos
+
+### 15.3 Ver ajuda de um comando
+
+```bash
+python manage.py popular_propriedades --help
+```
+
+### 15.4 Criar seus próprios comandos
+
+Para criar novos comandos personalizados:
+
+```bash
+# Estrutura de diretórios
+reconhecimentofacial/core/management/commands/
+├── __init__.py
+└── seu_comando.py
+```
+
+Exemplo de comando (`seu_comando.py`):
+```python
+from django.core.management.base import BaseCommand
+
+class Command(BaseCommand):
+    help = 'Descrição do seu comando'
+
+    def add_arguments(self, parser):
+        parser.add_argument('--opcao', type=str, help='Uma opção')
+
+    def handle(self, *args, **options):
+        self.stdout.write(self.style.SUCCESS('Comando executado!'))
+```
+
+Executar:
+```bash
+python manage.py seu_comando --opcao=valor
+```
+
+---
+
+## �🐛 13. Troubleshooting
 
 ### Problema: "Bad Gateway 502"
 ```bash
