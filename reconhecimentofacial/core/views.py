@@ -186,11 +186,210 @@ def login_facial_view(request):
     return render(request, 'core/login_facial.html')
 
 
+def preprocessar_imagem_opencv(image_np):
+    """
+    Pré-processa imagem com OpenCV para melhorar reconhecimento facial.
+    """
+    import cv2
+    import numpy as np
+    
+    try:
+        # 1. Converter RGB para BGR (OpenCV usa BGR)
+        image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+        
+        # 2. Avaliar qualidade da imagem
+        gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+        
+        # 2.1 Detectar blur (Laplacian variance)
+        blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
+        if blur_score < 30:  # Threshold mais permissivo
+            return None, blur_score, f"Imagem desfocada (score: {blur_score:.1f}). Use uma imagem mais nítida."
+        
+        # 2.2 Verificar brilho médio
+        brightness = np.mean(gray)
+        if brightness < 30:
+            return None, brightness, "Imagem muito escura. Melhore a iluminação."
+        if brightness > 240:
+            return None, brightness, "Imagem muito clara. Reduza a iluminação."
+        
+        # 3. Equalização adaptativa de histograma (CLAHE)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        
+        # Aplicar em cada canal de cor
+        b, g, r = cv2.split(image_bgr)
+        b_clahe = clahe.apply(b)
+        g_clahe = clahe.apply(g)
+        r_clahe = clahe.apply(r)
+        image_clahe = cv2.merge([b_clahe, g_clahe, r_clahe])
+        
+        # 4. Redução de ruído (Denoising)
+        image_denoised = cv2.fastNlMeansDenoisingColored(
+            image_clahe, 
+            None, 
+            h=10,
+            hColor=10,
+            templateWindowSize=7,
+            searchWindowSize=21
+        )
+        
+        # 5. Aumentar nitidez (Sharpening)
+        kernel_sharpening = np.array([
+            [-1, -1, -1],
+            [-1,  9, -1],
+            [-1, -1, -1]
+        ])
+        image_sharp = cv2.filter2D(image_denoised, -1, kernel_sharpening)
+        
+        # 6. Ajustar gamma para melhorar contraste
+        def adjust_gamma(image, gamma=1.2):
+            inv_gamma = 1.0 / gamma
+            table = np.array([((i / 255.0) ** inv_gamma) * 255 
+                            for i in np.arange(0, 256)]).astype("uint8")
+            return cv2.LUT(image, table)
+        
+        image_gamma = adjust_gamma(image_sharp, gamma=1.2)
+        
+        # 7. Converter de volta para RGB (para face_recognition)
+        image_processed = cv2.cvtColor(image_gamma, cv2.COLOR_BGR2RGB)
+        
+        # Calcular score de qualidade final
+        quality_score = min(100, (blur_score / 5) + (50 if 60 < brightness < 200 else 0))
+        
+        return image_processed, quality_score, None
+        
+    except Exception as e:
+        return None, 0, f"Erro no pré-processamento: {str(e)}"
+
+
+def detectar_qualidade_imagem(image_np):
+    """
+    Detecta qualidade da imagem e retorna score + sugestões.
+    """
+    import cv2
+    import numpy as np
+    
+    sugestoes = []
+    score = 100
+    
+    # Converter para BGR e grayscale
+    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+    gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+    
+    # 1. Verificar nitidez (blur)
+    blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
+    if blur_score < 30:
+        score -= 30
+        sugestoes.append("Imagem desfocada - segure a câmera com firmeza")
+    elif blur_score < 60:
+        score -= 15
+        sugestoes.append("Imagem levemente desfocada")
+    
+    # 2. Verificar iluminação
+    brightness = np.mean(gray)
+    if brightness < 40:
+        score -= 25
+        sugestoes.append("Ambiente muito escuro - aumente a iluminação")
+    elif brightness < 60:
+        score -= 10
+        sugestoes.append("Iluminação baixa")
+    elif brightness > 220:
+        score -= 20
+        sugestoes.append("Ambiente muito claro - reduza a luz")
+    elif brightness > 200:
+        score -= 10
+        sugestoes.append("Iluminação alta")
+    
+    # 3. Verificar contraste
+    contrast = gray.std()
+    if contrast < 25:
+        score -= 15
+        sugestoes.append("Baixo contraste - melhore a iluminação")
+    
+    # 4. Verificar se imagem está muito pixelada
+    height, width = gray.shape
+    if height < 240 or width < 320:
+        score -= 20
+        sugestoes.append("Resolução baixa - use câmera melhor")
+    
+    qualidade_ok = score >= 40  # Threshold mais permissivo
+    
+    if not sugestoes:
+        sugestoes.append("Qualidade de imagem boa!")
+    
+    return qualidade_ok, score, sugestoes
+
+
+def detectar_liveness(image_np):
+    """
+    Detecta se a imagem é de uma pessoa real (liveness detection).
+    Implementação simplificada usando análise de textura e variação de pixels.
+    """
+    import cv2
+    import numpy as np
+    
+    try:
+        # Converter para BGR e grayscale
+        image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+        gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+        
+        score = 100
+        reasons = []
+        
+        # 1. Análise de textura (LBP - Local Binary Pattern simplificado)
+        # Imagens de telas/fotos tendem a ter menos variação de textura
+        texture_variance = cv2.Laplacian(gray, cv2.CV_64F).var()
+        if texture_variance < 50:
+            score -= 40
+            reasons.append("Textura suspeita (possível foto de foto)")
+        
+        # 2. Análise de brilho especular
+        # Telas de celular/monitor tem brilho mais uniforme
+        brightness_std = gray.std()
+        if brightness_std < 30:
+            score -= 30
+            reasons.append("Brilho muito uniforme (possível tela)")
+        
+        # 3. Detecção de bordas (fotos tendem a ter bordas abruptas)
+        edges = cv2.Canny(gray, 100, 200)
+        edge_density = np.sum(edges > 0) / edges.size
+        if edge_density > 0.15:  # Muitas bordas podem indicar foto de foto
+            score -= 20
+            reasons.append("Muitas bordas detectadas")
+        
+        # 4. Análise de cores (telas tem gama de cores diferente)
+        color_std = np.std(image_np, axis=(0, 1))
+        if np.mean(color_std) < 20:
+            score -= 25
+            reasons.append("Variação de cor suspeita")
+        
+        # Decidir se passa no teste
+        is_live = score >= 50
+        
+        if is_live:
+            reason = "Imagem válida"
+        else:
+            reason = " | ".join(reasons)
+        
+        return {
+            'is_live': is_live,
+            'score': score,
+            'reason': reason
+        }
+        
+    except Exception as e:
+        # Em caso de erro, permitir por segurança (para não bloquear usuários legítimos)
+        return {
+            'is_live': True,
+            'score': 100,
+            'reason': f'Erro na detecção: {str(e)}'
+        }
+
+
 @csrf_exempt
 def reconhecer_face(request):
     """Processa a imagem capturada e tenta reconhecer o usuário"""
     # Import lazy para evitar problemas na inicialização do Django
-    import cv2
+    # import cv2
     import face_recognition
     import numpy as np
     from PIL import Image
@@ -217,19 +416,53 @@ def reconhecer_face(request):
         image_rgb = image.convert('RGB')
         image_np = np.array(image_rgb)
         
+        # Verificar qualidade da imagem
+        qualidade_ok, quality_score, sugestoes = detectar_qualidade_imagem(image_np)
+        
+        if not qualidade_ok:
+            return JsonResponse({
+                'success': False,
+                'message': 'Qualidade da imagem inadequada.',
+                'quality_score': quality_score,
+                'suggestions': sugestoes
+            })
+        
+        # Pré-processar com OpenCV
+        image_processed, process_score, error_msg = preprocessar_imagem_opencv(image_np)
+        
+        if image_processed is None:
+            return JsonResponse({
+                'success': False,
+                'message': error_msg,
+                'quality_score': process_score
+            })
+        
+        # Usar imagem processada para detecção
+        image_np = image_processed
+        
+        # === DETECÇÃO DE LIVENESS (ANTI-SPOOFING) ===
+        liveness_result = detectar_liveness(image_np)
+        if not liveness_result['is_live']:
+            return JsonResponse({
+                'success': False,
+                'message': f'Detecção de fraude: {liveness_result["reason"]}'
+            })
+        
         # Detectar faces na imagem capturada
         face_locations = face_recognition.face_locations(image_np)
         
         if not face_locations:
             return JsonResponse({
                 'success': False,
-                'message': 'Nenhum rosto detectado. Por favor, posicione seu rosto na câmera.'
+                'message': 'Nenhum rosto detectado. Por favor, posicione seu rosto na câmera.',
+                'suggestions': ['Centralize seu rosto na câmera', 'Melhore a iluminação']
             })
         
         if len(face_locations) > 1:
             return JsonResponse({
                 'success': False,
-                'message': 'Múltiplos rostos detectados. Certifique-se de estar sozinho na câmera.'
+                'message': 'Múltiplos rostos detectados. Certifique-se de estar sozinho na câmera.',
+                'suggestions': ['Apenas uma pessoa deve aparecer', 'Afaste outras pessoas']
             })
         
         # Extrair encoding da face capturada
@@ -237,7 +470,8 @@ def reconhecer_face(request):
         if not face_encodings:
             return JsonResponse({
                 'success': False,
-                'message': 'Não foi possível processar o rosto detectado.'
+                'message': 'Não foi possível processar o rosto detectado.',
+                'suggestions': ['Tente novamente', 'Melhore a iluminação']
             })
         
         captured_encoding = face_encodings[0]
@@ -253,13 +487,25 @@ def reconhecer_face(request):
         
         melhor_match = None
         menor_distancia = float('inf')
-        tolerancia = 0.6  # Quanto menor, mais rigoroso
+        
+        # Tolerância dinâmica baseada na qualidade
+        if quality_score >= 80:
+            tolerancia = 0.60  # Rigoroso para imagens boas
+        elif quality_score >= 60:
+            tolerancia = 0.65  # Médio
+        else:
+            tolerancia = 0.70  # Mais permissivo para imagens ruins
         
         # Comparar com cada usuário cadastrado
         for perfil in usuarios_com_foto:
             try:
                 # Carregar foto do perfil
                 perfil_image = face_recognition.load_image_file(perfil.foto.path)
+                
+                # Pré-processar foto do perfil também
+                perfil_processed, _, _ = preprocessar_imagem_opencv(perfil_image)
+                if perfil_processed is not None:
+                    perfil_image = perfil_processed
                 
                 # Detectar face na foto do perfil
                 perfil_face_locations = face_recognition.face_locations(perfil_image)
@@ -292,11 +538,16 @@ def reconhecer_face(request):
             # Calcular confiança do reconhecimento
             confianca_percentual = (1 - menor_distancia) * 100
             
-            # Validar confiança mínima de 60%
-            if confianca_percentual < 60:
+            # Validar confiança mínima (ajustada pela qualidade)
+            confianca_minima = 50 if quality_score >= 70 else 45
+            
+            if confianca_percentual < confianca_minima:
                 return JsonResponse({
                     'success': False,
-                    'message': f'Confiança muito baixa ({confianca_percentual:.1f}%). Tente novamente com melhor iluminação ou use login com senha.'
+                    'message': f'Confiança muito baixa ({confianca_percentual:.1f}%). Tente novamente.',
+                    'confidence': f'{confianca_percentual:.1f}%',
+                    'quality_score': quality_score,
+                    'suggestions': sugestoes + ['Tente capturar novamente', 'Melhore as condições']
                 })
             
             # Fazer login do usuário
@@ -306,12 +557,17 @@ def reconhecer_face(request):
                 'success': True,
                 'message': f'Bem-vindo(a), {melhor_match.get_full_name() or melhor_match.username}!',
                 'username': melhor_match.username,
-                'confidence': f'{confianca_percentual:.1f}%'
+                'confidence': f'{confianca_percentual:.1f}%',
+                'quality_score': quality_score,
+                'liveness_score': f'{liveness_result["score"]:.1f}',
+                'processing': 'OpenCV enhanced'
             })
         else:
             return JsonResponse({
                 'success': False,
-                'message': 'Rosto não reconhecido. Tente novamente ou use login com senha.'
+                'message': 'Rosto não reconhecido. Tente novamente ou use login com senha.',
+                'quality_score': quality_score,
+                'suggestions': sugestoes + ['Use login com senha', 'Tente com melhor iluminação']
             })
             
     except Exception as e:
