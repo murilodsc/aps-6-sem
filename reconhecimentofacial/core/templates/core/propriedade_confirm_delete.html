@@ -18,8 +18,7 @@
       <p><strong>Propriedade:</strong> {{ propriedade.nome_propriedade }}</p>
       <p><strong>Proprietário:</strong> {{ propriedade.proprietario }}</p>
       <p>
-        <strong>Cidade:</strong> {{ propriedade.cidade }}/{{ propriedade.estado
-        }}
+        <strong>Cidade:</strong> {{ propriedade.cidade }} / {{ propriedade.estado}}
       </p>
       <p><strong>Agrotóxico:</strong> {{ propriedade.agrotoxico_utilizado }}</p>
     </div>
@@ -32,7 +31,7 @@
     <form method="post" class="delete-form">
       {% csrf_token %}
       <div class="delete-actions">
-        <button type="submit" class="btn-danger">🗑️ Sim, Excluir</button>
+        <button type="submit" class="btn-danger">Sim, Excluir</button>
         <a
           href="{% url 'propriedade_detail' propriedade.pk %}"
           class="btn-secondary"

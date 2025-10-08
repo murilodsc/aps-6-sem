@@ -8,8 +8,20 @@
 <div class="detail-container">
   <div class="detail-header">
     <div>
-      <h1>🌾 {{ propriedade.nome_propriedade }}</h1>
+      <h1>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        {{ propriedade.nome_propriedade }}
+      </h1>
       <p class="detail-subtitle">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
         Cadastrado em {{ propriedade.data_cadastro|date:"d/m/Y H:i" }}
       </p>
     </div>
@@ -19,18 +31,37 @@
   </div>
 
   <div class="detail-actions">
-    <a href="{% url 'propriedades_list' %}" class="btn-secondary"> ← Voltar </a>
+    <a href="{% url 'propriedades_list' %}" class="btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5"></path>
+        <path d="M12 19l-7-7 7-7"></path>
+      </svg>
+      Voltar
+    </a>
     <a href="{% url 'propriedade_update' propriedade.pk %}" class="btn-primary">
-      ✏️ Editar
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+      </svg>
+      Editar
     </a>
     <a href="{% url 'propriedade_delete' propriedade.pk %}" class="btn-danger">
-      🗑️ Excluir
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"></path>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+      Excluir
     </a>
   </div>
 
   <div class="detail-grid">
     <div class="detail-card">
-      <h3>👤 Informações do Proprietário</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Informações do Proprietário
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Nome:</span>
@@ -44,7 +75,16 @@
     </div>
 
     <div class="detail-card">
-      <h3>📋 Dados da Propriedade</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <path d="M14 2v6h6"></path>
+          <path d="M16 13H8"></path>
+          <path d="M16 17H8"></path>
+          <path d="M10 9H8"></path>
+        </svg>
+        Dados da Propriedade
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Área:</span>
@@ -62,7 +102,13 @@
     </div>
 
     <div class="detail-card full-width">
-      <h3>📍 Localização</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="10" r="3"></circle>
+          <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z"></path>
+        </svg>
+        Localização
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Endereço:</span>
@@ -84,7 +130,12 @@
               target="_blank"
               class="link-maps"
             >
-              🗺️ Ver no Google Maps
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h6v6"></path>
+                <path d="M10 14L21 3"></path>
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              </svg>
+              Ver no Google Maps
             </a>
           </span>
         </div>
@@ -93,7 +144,14 @@
     </div>
 
     <div class="detail-card full-width alert-card">
-      <h3>☠️ Informações sobre Agrotóxicos Proibidos</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Informações sobre Agrotóxicos Proibidos
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Agrotóxico Identificado:</span>
@@ -119,14 +177,30 @@
     </div>
 
     <div class="detail-card full-width">
-      <h3>🌊 Descrição do Impacto Ambiental</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <path d="M14 2v6h6"></path>
+          <path d="M10 9H8"></path>
+          <path d="M16 13H8"></path>
+          <path d="M16 17H8"></path>
+        </svg>
+        Descrição do Impacto Ambiental
+      </h3>
       <div class="impact-description">
         <p>{{ propriedade.descricao_impacto }}</p>
       </div>
     </div>
 
     <div class="detail-card full-width metadata-card">
-      <h3>ℹ️ Informações do Registro</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 16v-4"></path>
+          <path d="M12 8h.01"></path>
+        </svg>
+        Informações do Registro
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Cadastrado por:</span>
@@ -134,11 +208,20 @@
             {% if propriedade.usuario_cadastro %}
             <div class="user-badges-detail">
               <span class="badge-perfil-detail badge-perfil-{{ propriedade.usuario_cadastro.perfil.tipo_perfil|lower }}">
-                {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display_icon }} {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display }}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display }}
               </span>
               <strong>{{ propriedade.usuario_cadastro.get_full_name|default:propriedade.usuario_cadastro.username }}</strong>
               {% if propriedade.usuario_cadastro.is_staff %}
-              <span class="badge-admin-detail">👑 Admin</span>
+              <span class="badge-admin-detail">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Admin
+              </span>
               {% endif %}
             </div>
             {% else %}

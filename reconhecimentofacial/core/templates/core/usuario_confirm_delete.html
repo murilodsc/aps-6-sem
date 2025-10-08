@@ -16,8 +16,7 @@ Exclusão - {{ usuario_perfil.username }}{% endblock %} {% block extra_styles %}
       <p><strong>Usuário:</strong> @{{ usuario_perfil.username }}</p>
       <p><strong>Email:</strong> {{ usuario_perfil.email }}</p>
       <p>
-        <strong>Cadastrado em:</strong> {{
-        usuario_perfil.date_joined|date:"d/m/Y" }}
+        <strong>Cadastrado em:</strong> {{usuario_perfil.date_joined|date:"d/m/Y H:i" }}
       </p>
     </div>
 
@@ -29,7 +28,7 @@ Exclusão - {{ usuario_perfil.username }}{% endblock %} {% block extra_styles %}
     <form method="post" class="delete-form">
       {% csrf_token %}
       <div class="delete-actions">
-        <button type="submit" class="btn-danger">🗑️ Sim, Excluir</button>
+        <button type="submit" class="btn-danger">Sim, Excluir</button>
         <a
           href="{% url 'usuario_detail' usuario_perfil.pk %}"
           class="btn-secondary"

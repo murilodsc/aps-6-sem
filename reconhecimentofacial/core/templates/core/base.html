@@ -11,27 +11,49 @@
   <body>
     <nav class="navbar">
       <div class="navbar-container">
-        <a class="navbar-brand" href="{% url 'index' %}"
-          >Sistema de Gestão</a
-        >
+        <a class="navbar-brand" href="{% url 'index' %}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Sistema de Gestão
+        </a>
         <div class="navbar-nav">
           {% if user.is_authenticated %}
           <div class="user-info-navbar">
             <span class="welcome-message">
-              Bem-vindo, {{ user.get_full_name|default:user.username }}!
+              {{ user.get_full_name|default:user.username }}
             </span>
             <span class="badge-perfil-nav badge-perfil-{{ user.perfil.tipo_perfil|lower }}">
-              {{ user.perfil.get_tipo_perfil_display_icon }} {{ user.perfil.get_tipo_perfil_display }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              {{ user.perfil.get_tipo_perfil_display }}
             </span>
           </div>
           <a class="nav-link" href="{% url 'index' %}">Home</a>
-          <a class="nav-link" href="{% url 'propriedades_list' %}"
-            >Propriedades</a
-          >
+          <a class="nav-link" href="{% url 'propriedades_list' %}">Propriedades</a>
           <a class="nav-link" href="{% url 'usuarios_list' %}">Usuários</a>
-          <a class="btn-logout" href="{% url 'logout' %}">Sair</a>
+          <a class="btn-logout" href="{% url 'logout' %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sair
+          </a>
           {% else %}
-          <a class="btn-login" href="{% url 'login' %}">Entrar</a>
+          <a class="btn-login" href="{% url 'login' %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            Entrar
+          </a>
           {% endif %}
         </div>
       </div>

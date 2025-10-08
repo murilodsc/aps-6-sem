@@ -1,3 +1,4 @@
+/* Global Styles - Minimalista */
 * {
   margin: 0;
   padding: 0;
@@ -7,14 +8,17 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background-color: #f5f5f5;
+  background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%);
   min-height: 100vh;
+  color: #111827;
 }
 
+/* Navbar - Minimalista */
 .navbar {
-  background-color: white;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 16px 0;
+  background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .navbar-container {
@@ -27,10 +31,19 @@ body {
 }
 
 .navbar-brand {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
   text-decoration: none;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s ease;
+}
+
+.navbar-brand:hover {
+  color: #3b82f6;
 }
 
 .navbar-nav {
@@ -39,117 +52,188 @@ body {
   align-items: center;
 }
 
+/* User Info Navbar - Minimalista */
 .user-info-navbar {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 0;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.user-info-navbar:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .welcome-message {
-  color: #1a1a1a;
+  color: #374151;
   font-size: 14px;
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   white-space: nowrap;
+  letter-spacing: -0.025em;
 }
 
+/* Badge Perfil Nav - Minimalista */
 .badge-perfil-nav {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 4px 10px;
-  border-radius: 10px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
-  align-self: flex-start;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
+}
+
+.badge-perfil-nav svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 .badge-perfil-comum {
-  background: #e0f2fe;
-  color: #075985;
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.badge-perfil-comum:hover {
+  background: #bfdbfe;
+  border-color: #60a5fa;
 }
 
 .badge-perfil-diretor {
-  background: #ddd6fe;
-  color: #5b21b6;
+  background: #fce7f3;
+  color: #be185d;
+  border: 1px solid #f9a8d4;
+}
+
+.badge-perfil-diretor:hover {
+  background: #fbcfe8;
+  border-color: #f472b6;
 }
 
 .badge-perfil-ministro {
   background: #fef3c7;
   color: #92400e;
-  border: 2px solid #f59e0b;
+  border: 1px solid #fcd34d;
 }
 
+.badge-perfil-ministro:hover {
+  background: #fde68a;
+  border-color: #fbbf24;
+}
+
+/* Nav Links - Minimalista */
 .nav-link {
-  color: #666;
+  color: #6b7280;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  position: relative;
+  padding: 4px 0;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #3b82f6;
+  transition: width 0.2s ease;
 }
 
 .nav-link:hover {
-  color: #1a1a1a;
+  color: #111827;
 }
 
-.navbar-text {
-  color: #666;
-  font-size: 14px;
+.nav-link:hover::after {
+  width: 100%;
 }
 
+/* Buttons - Minimalista */
 .btn-logout {
-  background: #1a1a1a;
+  background: #3b82f6;
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-logout:hover {
-  background: #333;
+  background: #2563eb;
   color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
 .btn-login {
   background: white;
-  color: #1a1a1a;
-  border: 1px solid #ddd;
+  color: #374151;
+  border: 1px solid #e5e7eb;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-login:hover {
-  border-color: #1a1a1a;
-  color: #1a1a1a;
+  border-color: #d1d5db;
+  color: #111827;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
+/* SVG Icons in Buttons */
+.btn-logout svg,
+.btn-login svg {
+  flex-shrink: 0;
+}
+
+/* Container */
 .container {
   max-width: 1200px;
   margin: 32px auto;
   padding: 0 24px;
 }
 
+/* Alerts - Minimalista */
 .alert {
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 24px;
   font-size: 14px;
   border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .alert-success {
@@ -174,4 +258,27 @@ body {
   background-color: #fffbeb;
   color: #92400e;
   border-color: #fde68a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-nav {
+    gap: 12px;
+  }
+  
+  .user-info-navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  
+  .welcome-message {
+    font-size: 13px;
+  }
+  
+  .badge-perfil-nav {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
 }

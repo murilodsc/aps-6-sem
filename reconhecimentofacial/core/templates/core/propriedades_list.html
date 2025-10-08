@@ -9,10 +9,22 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>🌾 Propriedades Rurais com Agrotóxicos Proibidos</h1>
+    <h1>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Propriedades Rurais
+    </h1>
     {% if pode_criar %}
     <a href="{% url 'propriedade_create' %}" class="btn-primary">
-        + Nova Propriedade
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nova Propriedade
     </a>
     {% endif %}
 </div>
@@ -44,15 +56,36 @@
             </select>
         </div>
         
-        <button type="submit" class="btn-filter">🔍 Filtrar</button>
-        <a href="{% url 'propriedades_list' %}" class="btn-clear">✖ Limpar</a>
+        <button type="submit" class="btn-filter">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            Filtrar
+        </button>
+        <a href="{% url 'propriedades_list' %}" class="btn-clear">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Limpar
+        </a>
     </form>
 </div>
 
 {% if page_obj %}
 <div class="card">
     <div class="card-header">
-        <h3>📋 Lista de Propriedades ({{ page_obj.paginator.count }} registros)</h3>
+        <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Lista de Propriedades ({{ page_obj.paginator.count }} registros)
+        </h3>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -78,7 +111,10 @@
                             {% if propriedade.usuario_cadastro %}
                             <div class="user-badges-table">
                                 <span class="badge-perfil-table badge-perfil-{{ propriedade.usuario_cadastro.perfil.tipo_perfil|lower }}">
-                                    {{ propriedade.usuario_cadastro.perfil.get_tipo_perfil_display_icon }}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
                                 </span>
                                 <span class="username-table">{{ propriedade.usuario_cadastro.get_full_name|default:propriedade.usuario_cadastro.username }}</span>
                             </div>
@@ -96,13 +132,22 @@
                         <td>{{ propriedade.data_identificacao|date:"d/m/Y" }}</td>
                         <td class="action-buttons">
                             <a href="{% url 'propriedade_detail' propriedade.pk %}" class="btn-action btn-view" title="Visualizar">
-                                👁️
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
                             </a>
                             <a href="{% url 'propriedade_update' propriedade.pk %}" class="btn-action btn-edit" title="Editar">
-                                ✏️
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
                             </a>
                             <a href="{% url 'propriedade_delete' propriedade.pk %}" class="btn-action btn-delete" title="Excluir">
-                                🗑️
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
                             </a>
                         </td>
                     </tr>
@@ -133,11 +178,22 @@
 {% else %}
 <div class="card">
     <div class="card-body empty-state">
-        <h3>📭 Nenhuma propriedade encontrada</h3>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <h3>Nenhuma propriedade encontrada</h3>
         <p>Clique no botão acima para cadastrar a primeira propriedade!</p>
+        {% if pode_criar %}
         <a href="{% url 'propriedade_create' %}" class="btn-primary">
-            + Cadastrar Primeira Propriedade
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Cadastrar Primeira Propriedade
         </a>
+        {% endif %}
     </div>
 </div>
 {% endif %}

@@ -10,7 +10,21 @@
 {% block content %}
 <div class="form-container">
     <div class="form-header">
-        <h2>{% if propriedade %}✏️ Editar Propriedade{% else %}➕ Nova Propriedade Rural{% endif %}</h2>
+        <h2>
+            {% if propriedade %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+            </svg>
+            {% else %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            {% endif %}
+            {% if propriedade %}Editar Propriedade{% else %}Nova Propriedade Rural{% endif %}
+        </h2>
         <p>Registre informações sobre propriedades que utilizam agrotóxicos proibidos</p>
     </div>
 
@@ -18,7 +32,13 @@
         {% csrf_token %}
         
         <div class="form-section">
-            <h3>📋 Informações da Propriedade</h3>
+            <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+                Informações da Propriedade
+            </h3>
             
             <div class="form-row">
                 <div class="form-group">
@@ -76,7 +96,13 @@
         </div>
 
         <div class="form-section">
-            <h3>📍 Localização</h3>
+            <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="10" r="3"></circle>
+                    <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z"></path>
+                </svg>
+                Localização
+            </h3>
             
             <div class="form-group">
                 <label for="endereco">Endereço Completo *</label>
@@ -165,7 +191,14 @@
         </div>
 
         <div class="form-section">
-            <h3>☠️ Informações sobre Agrotóxicos</h3>
+            <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                Informações sobre Agrotóxicos
+            </h3>
             
             <div class="form-row">
                 <div class="form-group">
@@ -224,10 +257,17 @@
 
         <div class="form-actions">
             <button type="submit" class="btn-primary">
-                {% if propriedade %}💾 Salvar Alterações{% else %}➕ Cadastrar Propriedade{% endif %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                {% if propriedade %}Salvar Alterações{% else %}Cadastrar Propriedade{% endif %}
             </button>
             <a href="{% url 'propriedades_list' %}" class="btn-secondary">
-                ✖ Cancelar
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6L6 18"></path>
+                    <path d="M6 6l12 12"></path>
+                </svg>
+                Cancelar
             </a>
         </div>
     </form>

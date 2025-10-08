@@ -319,72 +319,6 @@ def detectar_qualidade_imagem(image_np):
     return qualidade_ok, score, sugestoes
 
 
-def detectar_liveness(image_np):
-    """
-    Detecta se a imagem é de uma pessoa real (liveness detection).
-    Implementação simplificada usando análise de textura e variação de pixels.
-    """
-    import cv2
-    import numpy as np
-    
-    try:
-        # Converter para BGR e grayscale
-        image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-        gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
-        
-        score = 100
-        reasons = []
-        
-        # 1. Análise de textura (LBP - Local Binary Pattern simplificado)
-        # Imagens de telas/fotos tendem a ter menos variação de textura
-        texture_variance = cv2.Laplacian(gray, cv2.CV_64F).var()
-        if texture_variance < 50:
-            score -= 40
-            reasons.append("Textura suspeita (possível foto de foto)")
-        
-        # 2. Análise de brilho especular
-        # Telas de celular/monitor tem brilho mais uniforme
-        brightness_std = gray.std()
-        if brightness_std < 30:
-            score -= 30
-            reasons.append("Brilho muito uniforme (possível tela)")
-        
-        # 3. Detecção de bordas (fotos tendem a ter bordas abruptas)
-        edges = cv2.Canny(gray, 100, 200)
-        edge_density = np.sum(edges > 0) / edges.size
-        if edge_density > 0.15:  # Muitas bordas podem indicar foto de foto
-            score -= 20
-            reasons.append("Muitas bordas detectadas")
-        
-        # 4. Análise de cores (telas tem gama de cores diferente)
-        color_std = np.std(image_np, axis=(0, 1))
-        if np.mean(color_std) < 20:
-            score -= 25
-            reasons.append("Variação de cor suspeita")
-        
-        # Decidir se passa no teste
-        is_live = score >= 50
-        
-        if is_live:
-            reason = "Imagem válida"
-        else:
-            reason = " | ".join(reasons)
-        
-        return {
-            'is_live': is_live,
-            'score': score,
-            'reason': reason
-        }
-        
-    except Exception as e:
-        # Em caso de erro, permitir por segurança (para não bloquear usuários legítimos)
-        return {
-            'is_live': True,
-            'score': 100,
-            'reason': f'Erro na detecção: {str(e)}'
-        }
-
-
 @csrf_exempt
 def reconhecer_face(request):
     """Processa a imagem capturada e tenta reconhecer o usuário"""
@@ -439,14 +373,6 @@ def reconhecer_face(request):
         
         # Usar imagem processada para detecção
         image_np = image_processed
-        
-        # === DETECÇÃO DE LIVENESS (ANTI-SPOOFING) ===
-        liveness_result = detectar_liveness(image_np)
-        if not liveness_result['is_live']:
-            return JsonResponse({
-                'success': False,
-                'message': f'Detecção de fraude: {liveness_result["reason"]}'
-            })
         
         # Detectar faces na imagem capturada
         face_locations = face_recognition.face_locations(image_np)
@@ -539,7 +465,7 @@ def reconhecer_face(request):
             confianca_percentual = (1 - menor_distancia) * 100
             
             # Validar confiança mínima (ajustada pela qualidade)
-            confianca_minima = 50 if quality_score >= 70 else 45
+            confianca_minima = 55 if quality_score >= 70 else 50
             
             if confianca_percentual < confianca_minima:
                 return JsonResponse({
@@ -559,7 +485,6 @@ def reconhecer_face(request):
                 'username': melhor_match.username,
                 'confidence': f'{confianca_percentual:.1f}%',
                 'quality_score': quality_score,
-                'liveness_score': f'{liveness_result["score"]:.1f}',
                 'processing': 'OpenCV enhanced'
             })
         else:

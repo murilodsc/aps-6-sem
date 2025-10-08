@@ -1,59 +1,84 @@
+/* Page Header - Minimalista */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .page-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
+/* Buttons - Tailwind Style */
 .btn-primary {
-  background: #1a1a1a;
+  background: #3b82f6;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-primary:hover {
-  background: #333;
+  background: #2563eb;
   color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
+/* Card - Tailwind Style */
 .card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   overflow: hidden;
-  margin-top: 25px;
+  margin-top: 32px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e5e5;
+  padding: 24px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
 }
 
 .card-header h3 {
   font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.025em;
 }
 
 .card-body {
-  padding: 24px;
+  padding: 24px 28px;
 }
 
 .photo-grid {
@@ -98,213 +123,303 @@
   color: #666;
 }
 
+/* Empty State - Minimalista */
 .empty-state {
   text-align: center;
-  padding: 60px 24px;
+  padding: 80px 24px;
 }
 
 .empty-state h3 {
   font-size: 20px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 12px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+  letter-spacing: -0.025em;
 }
 
 .empty-state p {
   font-size: 14px;
-  color: #666;
+  color: #6b7280;
   margin-bottom: 24px;
+  line-height: 1.6;
 }
 
-/* Stats Grid */
+/* Stats Grid - Tailwind Style */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
 .stat-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 28px;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: flex-start;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .stat-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card:hover::before {
+  transform: scaleX(1);
 }
 
 .stat-icon {
-  font-size: 48px;
+  font-size: 40px;
   line-height: 1;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .stat-info {
   flex: 1;
+  min-width: 0;
 }
 
 .stat-info h3 {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #111827;
   margin-bottom: 4px;
+  line-height: 1;
+  letter-spacing: -0.025em;
 }
 
 .stat-info p {
   font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
+  color: #6b7280;
+  margin-bottom: 12px;
+  font-weight: 500;
 }
 
 .stat-link {
   font-size: 13px;
-  color: #1a1a1a;
+  color: #3b82f6;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
 }
 
 .stat-link:hover {
-  color: #333;
-  text-decoration: underline;
+  color: #2563eb;
+  gap: 8px;
 }
 
-/* Quick Menu */
+/* Quick Menu - Minimalista */
 .quick-menu {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .quick-menu h2 {
-  font-size: 22px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.025em;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
 
 .menu-card {
   background: white;
-  border: 2px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px 20px;
   text-align: center;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .menu-card:hover {
-  border-color: #1a1a1a;
+  border-color: #3b82f6;
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.menu-card:hover::before {
+  opacity: 1;
 }
 
 .menu-icon {
-  font-size: 48px;
+  font-size: 40px;
   margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.menu-card:hover .menu-icon {
+  transform: scale(1.1);
 }
 
 .menu-card h3 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8px;
+  color: #111827;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
 }
 
 .menu-card p {
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: #6b7280;
   margin: 0;
+  position: relative;
+  z-index: 1;
+  line-height: 1.5;
 }
 
-/* Recent Lists */
+/* Recent Lists - Minimalista */
 .list-recent {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .recent-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #e5e5e5;
-  transition: background-color 0.2s ease;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .recent-item:hover {
-  background: #f0f0f0;
+  background: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateX(4px);
 }
 
 .recent-info {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  min-width: 0;
 }
 
 .recent-info h4 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 4px;
+  color: #111827;
+  margin-bottom: 6px;
+  letter-spacing: -0.025em;
 }
 
 .recent-info p {
-  font-size: 14px;
-  color: #666;
+  font-size: 13px;
+  color: #6b7280;
   margin-bottom: 4px;
+  line-height: 1.5;
 }
 
 .recent-info small {
   font-size: 12px;
-  color: #999;
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 .recent-actions {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .btn-action {
-  background: #1a1a1a;
+  background: #3b82f6;
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-action:hover {
-  background: #333;
+  background: #2563eb;
   color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
-/* User Avatar Small */
+/* User Avatar Small - Minimalista */
 .user-avatar-small {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.recent-item:hover .user-avatar-small {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
 }
 
 .user-avatar-small img {
@@ -314,16 +429,17 @@
 }
 
 .avatar-placeholder {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 .badge-admin {
@@ -337,83 +453,141 @@
 
 .btn-secondary {
   background: white;
-  color: #1a1a1a;
-  border: 2px solid #e5e5e5;
+  color: #374151;
+  border: 1px solid #e5e7eb;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background: #f9f9f9;
-  border-color: #1a1a1a;
-  color: #1a1a1a;
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
-/* Badges de Nível */
+/* Badges de Nível - Tailwind Style */
 .badge-nivel-1 {
-  background: #fef3c7;
-  color: #92400e;
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
 }
 
 .badge-nivel-2 {
   background: #fed7aa;
   color: #9a3412;
+  border: 1px solid #fdba74;
 }
 
 .badge-nivel-3 {
   background: #fecaca;
   color: #991b1b;
+  border: 1px solid #fca5a5;
 }
 
 .badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* User badges on home page */
+/* User badges on home page - Tailwind Style Minimalista */
 .user-badges-home {
   display: flex;
-  gap: 8px;
-  margin: 10px 0;
+  gap: 6px;
+  margin: 8px 0;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .badge-perfil-home {
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
   font-weight: 600;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
 }
 
 .badge-perfil-comum {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.badge-perfil-comum:hover {
+  background: #bfdbfe;
+  border-color: #60a5fa;
 }
 
 .badge-perfil-diretor {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
+  background: #fce7f3;
+  color: #be185d;
+  border: 1px solid #f9a8d4;
+}
+
+.badge-perfil-diretor:hover {
+  background: #fbcfe8;
+  border-color: #f472b6;
 }
 
 .badge-perfil-ministro {
-  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-  color: white;
-  border: 2px solid #ffd700;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.badge-perfil-ministro:hover {
+  background: #fde68a;
+  border-color: #fbbf24;
 }
 
 .badge-admin-home {
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.025em;
+  box-shadow: 0 1px 2px 0 rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease;
+}
+
+.badge-admin-home:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Ícones SVG dentro das badges */
+.badge-perfil-home svg,
+.badge-admin-home svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.badge-admin-home svg {
+  stroke: currentColor;
+  fill: none;
 }

@@ -29,11 +29,32 @@
         </h1>
         <p class="detail-username">@{{ usuario_perfil.username }}</p>
         <div class="badges-container">
-          <span class="badge-perfil badge-perfil-{{ usuario_perfil.perfil.tipo_perfil|lower }}">
-            {{ usuario_perfil.perfil.get_tipo_perfil_display_icon }} {{ usuario_perfil.perfil.get_tipo_perfil_display }}
+          <span class="badge-perfil-detail badge-perfil-{{ usuario_perfil.perfil.tipo_perfil|lower }}">
+            {% if usuario_perfil.perfil.tipo_perfil == 'COMUM' %}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            {% elif usuario_perfil.perfil.tipo_perfil == 'DIRETOR' %}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            {% elif usuario_perfil.perfil.tipo_perfil == 'MINISTRO' %}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </svg>
+            {% endif %}
+            {{ usuario_perfil.perfil.get_tipo_perfil_display }}
           </span>
           {% if usuario_perfil.is_staff %}
-          <span class="badge-admin">👑 Administrador</span>
+          <span class="badge-admin-detail">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+            Administrador
+          </span>
           {% endif %}
         </div>
       </div>
@@ -41,22 +62,41 @@
   </div>
 
   <div class="detail-actions">
-    <a href="{% url 'usuarios_list' %}" class="btn-secondary"> ← Voltar </a>
+    <a href="{% url 'usuarios_list' %}" class="btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Voltar
+    </a>
     {% if request.user.is_staff or request.user.pk == usuario_perfil.pk %}
     <a href="{% url 'usuario_update' usuario_perfil.pk %}" class="btn-primary">
-      ✏️ Editar
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+      </svg>
+      Editar
     </a>
     {% endif %}
     {% if request.user.is_staff and request.user.pk != usuario_perfil.pk %}
     <a href="{% url 'usuario_delete' usuario_perfil.pk %}" class="btn-danger">
-      🗑️ Excluir
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      </svg>
+      Excluir
     </a>
     {% endif %}
   </div>
 
   <div class="detail-grid">
     <div class="detail-card">
-      <h3>📧 Contato</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        Contato
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Email:</span>
@@ -72,7 +112,13 @@
     </div>
 
     <div class="detail-card">
-      <h3>👤 Dados Pessoais</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Dados Pessoais
+      </h3>
       <div class="detail-info">
         {% if usuario_perfil.perfil.cpf %}
         <div class="info-item">
@@ -92,7 +138,13 @@
 
     {% if usuario_perfil.perfil.endereco %}
     <div class="detail-card full-width">
-      <h3>📍 Endereço</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        Endereço
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-value">{{ usuario_perfil.perfil.endereco }}</span>
@@ -101,7 +153,16 @@
     </div>
     {% endif %} {% if usuario_perfil.perfil.bio %}
     <div class="detail-card full-width">
-      <h3>📝 Biografia</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Biografia
+      </h3>
       <div class="bio-content">
         <p>{{ usuario_perfil.perfil.bio }}</p>
       </div>
@@ -109,7 +170,14 @@
     {% endif %}
 
     <div class="detail-card full-width metadata-card">
-      <h3>ℹ️ Informações do Sistema</h3>
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Informações do Sistema
+      </h3>
       <div class="detail-info">
         <div class="info-item">
           <span class="info-label">Data de Cadastro:</span>
@@ -131,9 +199,20 @@
           <span class="info-label">Status:</span>
           <span class="info-value">
             {% if usuario_perfil.is_active %}
-            <span class="badge-success">✅ Ativo</span>
+            <span class="badge-success">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Ativo
+            </span>
             {% else %}
-            <span class="badge-danger">❌ Inativo</span>
+            <span class="badge-danger">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Inativo
+            </span>
             {% endif %}
           </span>
         </div>
