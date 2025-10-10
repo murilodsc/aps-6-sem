@@ -322,8 +322,6 @@ def detectar_qualidade_imagem(image_np):
 @csrf_exempt
 def reconhecer_face(request):
     """Processa a imagem capturada e tenta reconhecer o usuário"""
-    # Import lazy para evitar problemas na inicialização do Django
-    # import cv2
     import face_recognition
     import numpy as np
     from PIL import Image
